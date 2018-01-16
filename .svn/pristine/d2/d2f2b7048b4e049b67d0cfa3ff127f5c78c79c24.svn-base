@@ -1,0 +1,174 @@
+import {
+	observable,
+	computed,
+	useStrict,
+	action,
+	runInAction,
+	autorun
+} from 'mobx';
+import apiUrl from 'utils';
+import {
+	ListView,
+	Toast
+} from 'antd-mobile';
+import {
+	getStore,
+	setStore
+} from 'utils/store';
+
+// let loc = JSON.parse(getStore('location'));
+// console.log(loc,'loc');
+
+
+
+useStrict(true);
+class Store {
+	constructor() {
+		this.loc = null;
+		console.log(this.quansId.id);
+	}
+	@computed get query() {
+		return {
+			...this.url,
+			order_type: this.navsValue.toString(),
+			qid: this.quansId.id || this.quansValue.toString(),
+			tid: this.catesValue.toString(),
+			page: this.page,
+			cate_id: this.cate_id,
+			m_longitude: this.loc ? this.loc.longitude : '',
+			m_latitude: this.loc ? this.loc.latitude : ''
+		};
+	}
+
+	url = {
+		ctl: 'index',
+		act: 'index',
+	}
+	// response data
+	page = 1
+	cate_id = null
+	AlreadyCompleted = false;
+	_quers = [];
+	quansId = JSON.parse(getStore('quansValue'));
+	@observable data = {}
+	@observable animating = false
+	@observable catesValue = []
+	@observable quansValue = [];
+	@observable navsValue = []
+	@observable isLoading = true;
+	@observable dataSource = new ListView.DataSource({
+		rowHasChanged: (row1, row2) => row1 !== row2,
+	})
+	@action setLoc = () => {
+		this.loc = JSON.parse(getStore('location'));
+	}
+	@action getData = async() => {
+		this.isLoading = true;
+		if (this.AlreadyCompleted) return;
+		const {
+			result,
+			sess_id
+		} = await apiUrl('', this.query);
+		runInAction(() => {
+			this.data = result;
+			this.navsValue = [result.navs[0].code];
+			this.quansValue = [result.quan_id];
+			this.catesValue = [result.bcate_list.bcate_type[0].id];
+			this.cate_id = result.bcate_list.id;
+			this.items = result.item;
+			setStore('sess_id', sess_id);
+			this.dataSource = this.dataSource.cloneWithRows(this.items);
+			this.isLoading = false;
+			this.AlreadyCompleted = true;
+		});
+	}
+	@action update = async() => {
+		this.isLoading = true;
+		this.page = 1;
+		this.animating = true;
+		this.dataSource = new ListView.DataSource({
+			rowHasChanged: (row1, row2) => row1 !== row2,
+		});
+		const {
+			result
+		} = await apiUrl('', this.query);
+		runInAction(() => {
+			this.data = result;
+			this.animating = false;
+			this.data.page = result.page;
+			this.items = result.item;
+			this.dataSource = this.dataSource.cloneWithRows(this.items);
+			this.isLoading = false;
+		});
+	}
+
+	// 下拉加载
+	@action loadMore = async() => {
+		if (this.page >= this.data.page.page_total) return false;
+		this.page = this.page + 1;
+		if (this.isLoading) return false;
+		this.isLoading = true;
+		const {
+			result
+		} = await apiUrl('', this.query);
+		runInAction(() => {
+			const newItems = [...this.items, ...result.item];
+			this.items = newItems;
+			this.dataSource = this.dataSource.cloneWithRows(newItems);
+			this.isLoading = false;
+		});
+	}
+	@action onChange = (value, type, cb) => {
+		if (Object.is(type, 'quansValue')) {
+			const id = value[0];
+			const target = this.data.quan_list.find(item => item.id == id);
+			setStore('quansValue', target);
+		}
+		this[type] = value;
+		cb && cb();
+	}
+	// 排序方式
+	@computed get navs() {
+		const {
+			navs = []
+		} = this.data;
+		const reslut = navs.map(item => ({
+			label: item.name,
+			value: item.code,
+		}));
+		return reslut;
+	}
+	// 商圈
+	@computed get quans() {
+		const {
+			quan_list = []
+		} = this.data;
+		const result = quan_list.map(item => {
+			return {
+				keyLabel: item && item.keyname,
+				label: item && item.name,
+				value: item && item.id,
+			};
+		});
+		return result;
+	}
+	// 美食分类
+	@computed get cates() {
+		const {
+			bcate_list
+		} = this.data;
+		if (!bcate_list) return;
+		const {
+			bcate_type
+		} = bcate_list;
+		const reslut = bcate_type.map(item => ({
+			label: item.name,
+			value: item.id,
+		}));
+		return reslut;
+	}
+}
+
+const store = new Store();
+
+export default store;

@@ -1,0 +1,96 @@
+@import 'entry';
+
+.col-img{
+	width: 160px;
+	height: 130px;
+	margin-bottom: 16px;
+	overflow: hidden;
+		img{
+			width: 160px;
+			height: 130px;
+	};
+}
+.shop-bg{
+	background: #fff;
+	height: 100%;
+	.shop-item{
+		padding: 30px 20px;
+		border-bottom: 1px solid #ddd;
+	}
+	.rightfont{
+		margin-left: 20px;
+		background: url("images/youjiantou.svg") no-repeat center top;
+		background-size: 30px;
+		width: 40px
+	}
+	.accoutone{
+		padding-left: 20px;
+		overflow: hidden;
+		position: relative;
+		&>div:first-child{
+			-webkit-overflow-scrolling: touch;
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+		}
+
+		h4{
+			font-size: 30px;
+			color: #333;
+			font-weight: normal;
+			margin:0;
+			padding-bottom: 10px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		};
+		p{
+			font-size: 24px;
+			color: #999999;
+			margin: 0;
+			padding-bottom: 8px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		};
+		span{
+			font-size: 26px;
+			color: #4596fa;
+			> i {
+				font-style: normal;
+				font-size: 24px;
+				color: #999999;
+				&.dayone{
+					display: inline-block;
+					@include bgImg(30px, 30px, 'images/gou.svg')
+				};
+			}
+		};
+	}
+}
+:global{
+	.coupon-boxs{
+		.am-list-view-scrollview{
+			height: 100%;
+		}
+		.coupon-nav{
+			height:75px;
+			line-height: 75px;
+			overflow: hidden;
+			text-align: center;
+			background: #fff;
+			border-bottom: 1px solid #ddd;
+			> div{
+				color: #333;
+				&.active{
+					color: #18a3f9;
+					border-bottom: 1px solid #18a3f9;
+				}
+			}
+		}
+	}
+}
+
+
+

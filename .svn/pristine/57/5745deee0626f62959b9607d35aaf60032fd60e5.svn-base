@@ -1,0 +1,74 @@
+@import "entry";
+.registertop{
+	height: 80px;
+	width: 100%;
+	border-top: 1px solid #dddddd;
+	padding:0 57px 0 80px;
+	background-color: #ffffff;
+};
+.leftregister,.rightregister{
+	height: 80px;
+	line-height: 80px;
+	text-align: center;
+	color: #333333;
+	font-size: 26px;
+	padding:0 32px;
+};
+.rightregister{
+	border-bottom: 2px solid blue;
+};
+.bg{
+	height: 66px;
+	background-color: #f4f4f4;
+}
+.psw{
+	font-size: 28px;
+	color: #999999;
+	height: 60px;
+	line-height: 60px;
+	padding: 25px;
+};
+
+.wx-login{
+	width: 200px;
+	text-align: right;
+	height: 60px;
+	line-height: 60px;
+	color: #ff9900;
+	font-size: 28px;
+	padding: 25px;
+}
+:global{
+	.login-form{
+		.am-list-body::before,.am-list-body::after{
+			background: transparent !important;
+			opacity: 0;
+		}
+		.am-tabs-tab-bar-wrap{
+			// top: 75px !important;
+			position: inherit;
+			z-index: 5;
+			bottom: auto;
+		}
+		.am-list-item .am-input-control .fake-input-container .fake-input-placeholder{
+			font-size: 34px !important;
+			color: #666;
+		}
+	}
+	.coll-nav{
+		height:80px;
+		line-height: 80px;
+		overflow: hidden;
+		text-align: center;
+		background: #fff;
+		border-bottom: 1px solid #ddd;
+		> div{
+			color: #333;
+			&.active{
+				color: #18a3f9;
+				border-bottom: 1px solid #18a3f9;
+			}
+		}
+	}
+}
+

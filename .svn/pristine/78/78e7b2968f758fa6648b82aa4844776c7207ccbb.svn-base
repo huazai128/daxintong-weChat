@@ -1,0 +1,254 @@
+import React, { Component } from 'react';
+import { List, InputItem, Button, Tabs, ListView, PullToRefresh, Toast } from 'antd-mobile';
+import { createForm } from 'rc-form';
+import CSSModules from 'react-css-modules';//是导入样式是使用的
+import styles from './payment.scss';//是导入样式是使用的--
+import { urlAPi } from 'service/api';
+import { SubViewLink } from 'app/components/subViewLink/subViewLink';
+import Pop from 'components/Pop/pop';
+import ReactDOM from 'react-dom';
+import ConfirmHtml from 'components/ConfirmHtml/';
+import ConfirmButton from 'components/ConfirmButton/';
+
+@CSSModules(styles)
+class PayItem extends Component {
+	constructor(props) {
+		super(props);
+	}
+	render() {
+		const { rowData, rowID, cancelPay, isPop, refresh } = this.props;
+		return (
+			<div className="order-dent" key={rowID} >
+				<SubViewLink moduleName='orderDetail' title="订单详情" modelData={{ id: rowData.id, page: rowData.is_open_button, refresh: refresh }}>
+					<div styleName="item" className="flex">
+						<div className="flex-g-1" styleName="order-info">
+							<div>
+								<div className="flex">
+									<div styleName="order-img"><img src={rowData.deal_icon} /></div>
+									<div className="flex-g-1">
+										<h4>{rowData.name}</h4>
+										<p>数量：{rowData.number}</p>
+										<span>应付金额：{rowData.total_price}元</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div className="order-type">
+							<h4>{rowData.status}</h4>
+						</div>
+					</div>
+				</SubViewLink>
+				<div className="order-pos">
+					{Object.is(rowData.is_open_button, 1) && (
+						<div className="flex jc-between">
+							<button type="button" className="btn" onClick={() => cancelPay(rowData.id, isPop)}>取消订单</button>
+							<button type="button" className="btn btn-border">
+								<SubViewLink moduleName="pay" title="支付订单" modelData={{ order_id: rowData.id, refresh: refresh}}>去支付</SubViewLink>
+							</button>
+						</div>)}
+					{Object.is(rowData.is_open_button, 2) && (
+						<div className="flex jc-end">
+							<button type="button" className="btn btn-border">
+								<SubViewLink moduleName='codeDetail' title="团购券" modelData={{ id: rowData.id }} >查看券码</SubViewLink>
+							</button>
+						</div>
+					)}
+					{Object.is(rowData.is_open_button, 3) && (
+						<div className="flex jc-end">
+							<button type="button" className="btn btn-border">
+								<SubViewLink moduleName='evaluate' title="我要评价" modelData={{ data_id: rowData.deal_id, type: 'deal', refresh: refresh }} >去评价</SubViewLink>
+							</button>
+						</div>
+					)}
+				</div>
+			</div>
+		);
+	}
+}
+
+const tabs = [
+	{ title: '全部', active: false },
+	{ title: '待付款', active: false },
+	{ title: '待使用', active: false },
+	{ title: '待评价', active: false },
+	{ title: '退款/售后', active: false }
+];
+
+@CSSModules(styles)
+export default class extends Component {
+	constructor() {
+		super();
+		const dataSource = new ListView.DataSource({
+			rowHasChanged: (row1, row2) => row1 !== row2,
+		});
+		this.state = {
+			status: 0, // 状态
+			result: {},
+			lists: [],
+			isPop: false,
+			orderId: '',
+			dataSource: dataSource,
+			isLoading: true,
+			page: 1,
+			pageInfo: {},
+			hasMore: true,
+			tabLists: tabs
+		};
+	}
+	componentDidMount() {
+		let status = this.props.modelData ? this.props.modelData.page : Number(this.props.params.id);
+		this.state.tabLists = this.state.tabLists.map((item) => {
+			item.active = false;
+			return item;
+		});
+		this.state.tabLists[status].active = true;
+		this.setState({
+			tabLists: this.state.tabLists,
+			status: status
+		});
+		setTimeout(() => {
+			this.getOrderLists(status, 1);
+		}, 500);
+	}
+	refresh = () => {
+		const { status } = this.state;
+		this.setState({
+			lists: [],
+			dataSource: this.state.dataSource.cloneWithRows([]),
+		});
+		this.getOrderLists(status, 1);
+	}
+	// 获取订单列表数据
+	getOrderLists = async (status, page) => {
+		const res = await urlAPi.pay_status({ pay_status: status, page: page });
+		if (Object.is(res.code, 0) && Object.is(res.message, 'ok')) {
+			let data = [...this.state.lists, ...res.result.item];
+			this.setState({
+				dataSource: this.state.dataSource.cloneWithRows(data),
+				isLoading: false,
+				result: res.result,
+				lists: data,
+				pageInfo: res.result.page,
+				page: page,
+				hasMore: (res.result.page.page_total <= page) ? false : true
+			});
+		}
+	}
+	// 取消支付
+	cancelPay(value, isPop) {
+		isPop ? this.setState({
+			isPop: false,
+			orderId: ''
+		}) : this.setState({
+			isPop: true,
+			orderId: value
+		});
+	}
+	// 取消
+	cancel = () => {
+		this.setState({
+			isPop: false,
+			orderId: ''
+		});
+	}
+	// 确认
+	confirm = async () => {
+		const { orderId, status, page } = this.state;
+		if (orderId) {
+			const res = await urlAPi.cancelPay({ id: orderId });
+			Toast.info(res.message, 2, null, false);
+			if (Object.is(res.code, 0) && Object.is(res.message, '订单操作成功')) {
+				this.setState({
+					isPop: false,
+					orderId: '',
+					lists: []
+				});
+				this.getOrderLists(status, page);
+			}
+		}
+	}
+	// 加载更多
+	loadMore = async () => {
+		const { pageInfo, hasMore, isLoading, page, status } = this.state;
+		if (page >= pageInfo.page_total) {
+			this.setState({
+				hasMore: false
+			});
+			return false;
+		}
+		if (isLoading) return false;
+		this.setState({
+			isLoading: true
+		});
+		let currentPage = page + 1;
+		this.getOrderLists(status, currentPage);
+	}
+	tabClick = (index) => {
+		if(this.state.isLoading) return false;
+		this.state.tabLists = this.state.tabLists.map((item) => {
+			item.active = false;
+			return item;
+		});
+		this.state.tabLists[index].active = true;
+		this.setState({
+			lists: [],
+			dataSource: this.state.dataSource.cloneWithRows([]),
+			isLoading: true,
+			page: 1,
+			status: index,
+			pageInfo: {},
+			tabLists: this.state.tabLists,
+		});
+		this.getOrderLists(index, 1);
+	}
+	render() {
+		const { history } = this.props;
+		let id = this.props.modelData ? this.props.modelData.page : Number(this.props.params.id);
+
+		const { result, lists, isPop, orderId, dataSource, tabLists, height, status, isLoading } = this.state;
+		const row = (rowData, rowID) => {
+			return (
+				<PayItem rowData={rowData} rowID={rowID} isPop={isPop} refresh={this.refresh} cancelPay={() => { this.cancelPay(rowData.id, isPop); }}></PayItem>
+			);
+		};
+		return (
+			<div className="tabs flex-col">
+				{isPop ? <Pop onCancel={this.cancel} onConfirm={this.confirm}></Pop> : null}
+				<div className="flex tabs-nav">
+					{tabLists && tabLists.map((item, index) => {
+						return (<div key={index} className={`flex-g-1 ${item.active ? 'active' : ''}`} onClick={() => { this.tabClick(index); }}>{item.title}</div>);
+					})}
+				</div>
+
+				<div styleName="tabs-box" className="scroll-absolute flex-g-1">
+					<div>
+						{Array.from({ length: 5 }).map((item, index) => {
+							return (
+								Object.is(status, index) && (
+									<ListView
+										ref={el => this.lv = el}
+										key={index}
+										dataSource={this.state.dataSource}
+										renderFooter={() => (<div style={{ padding: 30, textAlign: 'center' }}>
+											{isLoading ? '加载中...' : '没有更多数据加载了!'}
+										</div>)}
+										renderRow={row}
+										style={{
+											heihgt: height,
+											overflow: 'auto',
+										}}
+										pageSize={4}
+										onEndReachedThreshold={50}
+										onScroll={() => { }}
+										scrollRenderAheadDistance={200}
+										onEndReached={this.loadMore}
+										onLayout={({ nativeEvent: { layout: { width, height } } }) => { }}
+									/>
+								)
+							);
+						})}
+					</div>
+				</div>
+			</div>);
+	}
+}

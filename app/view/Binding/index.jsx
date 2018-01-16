@@ -1,0 +1,213 @@
+import React, { Component } from 'react';
+import { List, InputItem, Button, Toast } from 'antd-mobile';
+import { createForm } from 'rc-form';
+import CSSModules from 'react-css-modules';//是导入样式是使用的
+import styles from './binding.scss';//是导入样式是使用的--
+import { urlAPi } from 'service/api';
+import { hashHistory } from 'react-router';
+import { codeImg } from 'utils';
+import { SubViewLink, subViewHandle } from 'app/components/subViewLink/subViewLink';
+import { getStore } from 'utils/store';
+import TuImg from 'components/TuImg/tu';
+
+@createForm()
+@CSSModules(styles)
+export default class Form extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			isSend: false,
+			err: {},
+			timer: null,
+			phoneText: '获取验证码',
+			isSubmit: false,
+			isPhone: false,
+			disabled: false,
+			imgstate: new Date().getTime(),
+			sess_id: getStore('sess_id'),
+			isBtn: false,
+			isAir:false
+		};
+	}
+	// 组件销毁前触发
+	componentWillUnmount() {
+		clearInterval(this.state.timer);
+		this.setState({ err: null, timer: null, disabled: false });
+	}
+	// 获取验证码
+	sendPhone = async () => {
+		const { isSend, isPhone } = this.state;
+		if (isSend || !isPhone) return false;
+		this.setState({ phoneText: '验证码已发送', isSend: true, disabled: true });
+		const phone = this.props.form.getFieldValue('mobile');
+		const res = await urlAPi.sendTest({ 'mobile': phone, unique: 0, classtype: 0 });
+		Toast.info(res.message, 2, null, false);
+		setTimeout(() => {
+			this.getTime();
+		}, 3000);
+	}
+	// 提交手机登录
+	submitBind = () => {
+		this.props.form.validateFields((err, values) => {
+			if (!err) {
+				this.bindCard(values);
+			}
+			this.setState({ err: err || {} });
+		});
+	}
+	bindCard = async (parmas) => {
+		if (this.state.isBtn) return false;
+		this.setState({
+			isBtn: true
+		});
+		const res = await urlAPi.bindCard(parmas);
+		Toast.info(res.message, 2, null, false);
+		if (Object.is(res.code, 0)) {
+			if (Object.is(res.result.daxt_status, 1)) {
+				if (this.props.modelData) {
+					if (this.props.modelData.change) {
+						this.props.modelData.change();
+					}
+					hashHistory.goBack();
+				} else {
+					subViewHandle.replaceView('dxcard', {
+						title: '大信通卡'
+					});
+				}
+			}
+		}else{
+			this.refs.tuImg.update();
+		}
+		this.setState({
+			isBtn: false
+		});
+	}
+	// 倒计时
+	getTime = () => {
+		let times = 60;
+		this.state.timer = setInterval(() => {
+			times--;
+			if (times <= 0) {
+				clearInterval(this.state.timer);
+				times = 60;
+				this.setState({ sendState: false, isSend: false, phoneText: '获取验证码', disabled: false });
+			} else {
+				this.setState({ phoneText: times + '秒后重试' });
+			}
+		}, 1000);
+	}
+	render() {
+		const { getFieldProps } = this.props.form;
+		const { isSend, err, phoneText, isPhone, disabled, imgstate, sess_id, isBtn } = this.state;
+		return (
+			<div className="form-bind">
+				<List>
+					<div className="form-group">
+						<InputItem
+							{...getFieldProps('dxtg_card', {
+								rules: [
+									{ required: true, message: '请输入您的银行卡号' },
+								]
+							}) }
+							type='number'
+							error={err.dxtg_card}
+							onFocus={() => { delete err.dxtg_card; this.setState({ err: err }); }}
+							placeholder="大信通卡支付账号"
+							moneyKeyboardAlign="left"
+						><i className="form-icon accoumt"></i></InputItem>
+					</div>
+					<div className="form-group">
+						<InputItem
+							{...getFieldProps('certificates', {
+								rules: [
+									{ required: true, message: '请输入正确的证件号' },
+								]
+							}) }
+							type='number'
+							error={err.certificates}
+							onFocus={() => { delete err.certificates; this.setState({ err: err }); }}
+							placeholder="预留证件号后六位数"
+							moneyKeyboardAlign="left"
+						><i className="form-icon yu" ></i></InputItem>
+					</div>
+					<div className="form-group">
+						<InputItem
+							{...getFieldProps('name', {
+								relus: [
+									{ required: true, message: '请输入您的姓名' },
+								]
+							}) }
+							error={err.name}
+							onFocus={() => { delete err.name; this.setState({ err: err }); }}
+							placeholder="持卡人姓名"
+							moneyKeyboardAlign="left"
+						><i className="form-icon name" ></i></InputItem>
+					</div>
+					<div className="flex jc-between form-group">
+						<div className="flex-g-1">
+							<InputItem
+								{...getFieldProps('mobile', {
+									rules: [
+										{ required: true, message: '请输入您的手机号码' },
+										{ pattern: /^((1[3-8][0-9])+\d{8})$/, message: '请填写正确的手机号码' },
+										{
+											validator: (rule, value, callback) => {
+												if (/^((1[3-8][0-9])+\d{8})$/.test(value)) {
+													this.setState({ isPhone: true });
+												} else {
+													clearInterval(this.state.timer);
+													this.setState({ isPhone: false, phoneText: '获取验证码', timer: null, isSend: false });
+												}
+												callback();
+											}
+										}
+									]
+								}) }
+								error={err.mobile}
+								disabled={disabled}
+								onFocus={() => { delete err.mobile; this.setState({ err: err }); }}
+								type='number'
+								placeholder="手机号"
+								moneyKeyboardAlign="left"
+							><i className="form-icon phone" ></i></InputItem>
+						</div>
+						<button type="button" className={`yanzheng ${isPhone ? 'send' : ''}`} onClick={() => this.sendPhone()}>{phoneText}</button>
+					</div>
+					<div className="form-group">
+						<InputItem
+							{...getFieldProps('sms_verify', {
+								rules: [
+									{ required: true, message: '请填写验证码' }
+								]
+							}) }
+							error={err.sms_verify}
+							placeholder="短信验证"
+							moneyKeyboardAlign="left"
+						><i className="form-icon icon-ma" ></i></InputItem>
+					</div>
+					<div className="flex jc-between form-group">
+						<div className="flex-g-1">
+							<InputItem
+								{...getFieldProps('verify_code', {
+									rules: [
+										{ required: true, message: '请填写验证码' },
+									]
+								}) }
+								error={err.verify_code}
+								placeholder="请输入校验码"
+								moneyKeyboardAlign="left"
+							><i className="form-icon icon-ma" ></i></InputItem>
+						</div>
+						<div className="ml20">
+							<TuImg ref="tuImg"></TuImg>
+						</div>
+					</div>
+					<div className={ `btn ${isBtn ? 'send' :''}` }
+						style={{ width: '100%', textAlign: 'center' }}
+						onClick={this.submitBind}>绑定
+					</div>
+				</List>
+			</div>
+		);
+	}
+}

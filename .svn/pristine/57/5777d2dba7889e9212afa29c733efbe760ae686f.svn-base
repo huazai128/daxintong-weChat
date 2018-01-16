@@ -1,0 +1,121 @@
+@import 'entry';
+.pay-box{
+	padding: 25px 20px;
+	background: #fff;
+	border-top: 1px solid #ddd;
+	h4{
+		font-size: 30px;
+		font-weight: normal;
+		color: #333;
+		margin: 0;
+		margin-bottom: 10px;
+		overflow : hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+	}
+	p{
+		font-size: 24px;
+		color: #999;
+		margin: 12px 0;
+	}
+}
+.pay-img{
+	width: 150px;
+	height: 120px;
+	overflow: hidden;
+	margin-right: 20px;
+	> img{
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+	}
+}
+.pay-contrl{
+	font-size: 26px;
+	color: #68bf00;
+	> div{
+		margin-right: 15px;
+		padding: 2px 0 2px 40px;
+		background: url('images/select.svg') no-repeat left center;
+		background-size: 32px;
+		max-height: 70px;
+		overflow: hidden;
+	}
+}
+.pay-num{
+	font-size: 28px;
+	color: #666;
+	width: 220px;
+	text-align: right;
+}
+.pay-style{
+	margin-bottom: 125px;
+
+	background: #fff;
+	padding-left: 20px;
+	.pay-item{
+		border-top:1px solid #e1e1e1;
+		height: 92px;
+		line-height: 92px;
+		font-size: 30px;
+		color: #333;
+		padding-right: 20px;
+	}
+
+}
+.pay-btn{
+	padding: 0 65px;
+	> div{
+		width: 100%;
+		height:90px;
+		line-height: 90px;
+		outline: none;
+		border: 0;
+		text-align: center;
+		font-size: 30px;
+		background: #e5e5e5;
+		color: #666;
+		border-radius: 15px;
+		&.btn{
+			background: #4794fe;
+			color: #fff;
+		}
+	}
+}
+
+.pay-name{
+	font-size: 30px;
+	color: #333;
+}
+:global{
+	.cap{
+		position: relative;
+		width: 34px;
+		height: 34px;
+		top: 50%;
+		margin-top: -15px;
+		border:2px solid #1aa1fa;
+		border-radius: 50px;
+		&.pselect::before{
+			width: 24px;
+			height: 24px;
+			top:5px;
+			left: 5px;
+			border-radius: 50%;
+			position: absolute;
+			content: "";
+			background: #1aa1fa;
+		}
+	}
+	.payed{
+		.am-navbar{
+			background:	#3799F7;
+		}
+	}
+}
+.bind-btn{
+	font-size: 28px;
+	color: #ff9900;
+}

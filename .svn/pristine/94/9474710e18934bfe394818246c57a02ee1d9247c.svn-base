@@ -1,0 +1,129 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { hashHistory } from 'react-router';
+
+class SubViewHandle2 {
+	constructor() {
+		let self = this;
+		this.subNode = [];
+
+		this.originHash = window.location.hash.split('?')[0].replace(/[#//?]/g, '');
+
+		var r = /\[(.+?)\]/g;
+		var m = this.originHash.match(r);
+		this.originSubLen = this.subNode.length;
+		setInterval(() => {
+			let nowHash = window.location.hash.split('?')[0].replace(/[#//?]/g, '');
+
+			if (this.originHash !== nowHash) {
+				//路由有变化
+				if (nowHash.indexOf('~') !== -1) {
+					this.nowSubLen = Number(nowHash.match(r)[0].substr(1, 1));
+					//有滑出来子页面
+					this.historyPop(this.nowSubLen < this.originSubLen);
+				} else {
+					//有滑出来子页面
+					this.popAllView();
+				}
+			}
+			this.originHash = nowHash;
+			this.originSubLen = this.nowSubLen;
+		}, 150);
+	}
+
+	historyPush() {
+		let hash = window.location.hash.split('?')[0].replace(/[#//?]/g, ''); //根
+		hash = hash.split('~')[0].replace(/[#//?]/g, ''); //根
+		let name = hash + '~' + (this.subNode[this.subNode.length - 1].name) + '[' + this.subNode.length + ']';
+		hashHistory.push(name);
+	}
+
+	historyPop(flag) {
+		if (flag === true) {
+			//销毁当前的子页面
+			this.popView();
+		} else {
+			//新的子页面进来
+			// this.historyPush();
+		}
+	}
+
+
+	pushView(name, options) {
+		let node = document.createElement('div');
+		document.body.appendChild(node);
+		let reactNode = ReactDOM.render(
+			<SubView options={options} name={name} />, node);
+		node.name = name;
+		this.subNode.push(node);
+		this.historyPush();
+	}
+
+	popAllView() {
+		while (this.subNode.length > 0) {
+			let node = this.subNode.pop();
+			ReactDOM.unmountComponentAtNode(node);
+			node.parentNode.removeChild(node);
+		}
+	}
+	popView() {
+		if (this.subNode.length > 0) {
+			let node = this.subNode.pop();
+			ReactDOM.unmountComponentAtNode(node);
+			node.parentNode.removeChild(node);
+		}
+	}
+}
+
+if (!window.subViewHandle2) {
+	window.subViewHandle2 = new SubViewHandle2();
+}
+let subViewHandle = window.subViewHandle2;
+
+class SubView extends React.Component {
+	constructor() {
+		super();
+		this.state = {
+			module: null
+		}
+	}
+	componentDidMount() {
+		window.SubViewRoutes[this.props.name]((Module) => {
+			this.state.module = <Module modelData={this.props.options} />;
+			setTimeout(() => {
+				this.setState({ module: this.state.module, });
+			}, 350);
+		});
+	}
+	close = () => {
+		subViewHandle.popView()
+	}
+	render() {
+		let moduleNode;
+		if (this.state.module) {
+			moduleNode = this.state.module;
+		}
+
+		return (
+			<div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#fff' }}>
+				<div onClick={this.close} style={{ height: '100px', width: '100%' }}></div>
+				{moduleNode}
+			</div>
+		);
+	}
+}
+
+class SubViewLink2 extends React.Component {
+	onClick = (e) => {
+		e.preventDefault();
+		subViewHandle.pushView(this.props.name, this.props.options);
+	}
+	render() {
+		return <div onClick={this.onClick}>
+			{this.props.children}
+		</div>;
+	}
+}
+
+
+export { SubViewLink2 };

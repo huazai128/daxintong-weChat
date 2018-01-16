@@ -1,0 +1,191 @@
+import React, { Component } from 'react';
+import CSSModules from 'react-css-modules';//是导入样式是使用的
+import styles from './index.scss';//是导入样式是使用的--
+import { urlAPi } from 'service/api';
+import { SubViewLink, subViewHandle } from 'app/components/subViewLink/subViewLink';
+import { hashHistory } from 'react-router';
+import { removeStore } from 'utils/store';
+import { Toast } from 'antd-mobile';
+import Nav from 'components/Navtwo';
+import DxPass from 'components/DxPass/';
+
+@CSSModules(styles)
+class SelectRadioItem extends Component {
+	constructor(props) {
+		super(props);
+	}
+	render() {
+		let { change, isClick } = this.props;
+		return (<div>
+			{this.props.data.map((item, index) => {
+				let pselect = '';
+				if (item.id === this.props.value) {
+					pselect = 'pselect';
+				}
+				return <div className="flex jc-between" styleName="pay-item" key={item.id} onClick={() => { if (isClick) return false; if (Object.is(item.is_binding, 1)) { this.props.onChange(item.id, item.name); } }}>
+					<div styleName="pay-name">{item.name}</div>
+					{Object.is(item.is_binding, 1) ? (<div className={`${pselect} cap`} ></div>) : (<div styleName="bind-btn"><SubViewLink moduleName="binding" title="大信通卡" modelData={{ change: change }}>未绑定</SubViewLink></div>)}
+				</div>;
+			})}
+		</div>);
+	}
+}
+@CSSModules(styles)
+class PayPage extends Component {
+	constructor() {
+		super();
+		this.state = {
+			payType: '',
+			payment_list: [],
+			cart_info: {},
+			order_sn: '',
+			total_price: 0,
+			order_id: '',
+			payStyle: {}, // 支付信息
+			name: '',
+			flag: false,
+			isClick: false,
+			isDx: false,
+			isPass: false
+		};
+	}
+	componentDidMount() {
+		const { location } = this.props;
+		if (location && location.query && location.query.flag) {
+			removeStore('isStatus');
+			this.setState({
+				flag: true
+			});
+		}
+		this.getPay();
+	}
+	getPay = async () => {
+		const order_id = this.props.modelData ? this.props.modelData.order_id : this.props.params.id;
+		const res = await urlAPi.payOrder({ order_id: order_id });
+		if (Object.is(res.code, 0) && Object.is(res.message, 'ok')) {
+			const { payment_list, cart_info, order_sn, order_id, total_price } = res.result;
+			let idx;
+			payment_list.map((item, index) => {
+				if (Object.is(item.is_binding, 0)) {
+					idx = index;
+				}
+			});
+			const idex = (!idx && idx != 0) ? 0 : idx + 1;
+			let id = payment_list[idex].id;
+			this.setState({
+				payment_list: payment_list,
+				cart_info: cart_info,
+				order_sn: order_sn,
+				total_price: total_price,
+				order_id: order_id,
+				payType: id,
+				name: payment_list[idex].name
+			});
+			this.payStyles(id);
+		}
+	}
+	// 选择支付方式
+	payStyles = async (payType) => {
+		const { order_id, isClick } = this.state;
+		if (isClick) return false;
+		this.setState({
+			isClick: true,
+			isPass: false
+		});
+		const params = {
+			order_id: order_id,
+			payment: payType
+		};
+		const res = await urlAPi.payStyle(params);
+		if (Object.is(res.code, 0)) {
+			this.setState({
+				payStyle: res.result.payment_code,
+				isClick: false,
+				isPass: true
+			});
+		}
+	}
+	componentWillUnmount() {
+		if (this.props.modelData && this.props.modelData.refresh) {
+			this.props.modelData.refresh();
+		}
+		this.setState({
+			isClick: false
+		});
+		removeStore('isStatus');
+	}
+	// 提交支付
+	btnPay = async (pay_action) => {
+		const { order_id, payType, name, payStyle,isPass } = this.state;
+		if(!isPass) return false;
+		if (!payType) {
+			return false;
+		}
+		if (Object.is(name, '大信通卡支付')) {
+			this.setState({
+				isDx: true
+			});
+		} else if (Object.is(name, '微信支付')) {
+			let redirect_url = location.href.split('#')[0];
+			const url = encodeURIComponent(`${redirect_url}#/blank/${order_id}`);
+			window.location.href = `${payStyle.pay_action}&redirect_url=${url}`;
+		}
+	}
+	confirm = async (daxt_paw) => {
+		Toast.info('提交数据中...', 10);
+		const { payStyle, order_id } = this.state;
+		const params = {
+			daxt_notice: payStyle.notice_sn,
+			daxt_paw: daxt_paw || ''
+		};
+		const res = await urlAPi.btnPay(params);
+		Toast.hide();
+		Toast.info(res.message, 2);
+		this.setState({
+			isDx: false
+		});
+		if (Object.is(res.code, 0)) {
+			hashHistory.replace('payed/' + order_id);
+		}
+	}
+	cancel = () => {
+		this.setState({
+			isDx: false
+		});
+	}
+	change = () => {
+		this.getPay();
+	}
+	// 使用大信通支付
+	render() {
+		const { payment_list, cart_info, order_sn, total_price, payType, flag, isDx, isPass, payStyle, isClick } = this.state;
+		return (
+			<div className="payed">
+				{flag && <Nav >提交订单</Nav>}
+				{isDx && <DxPass confirm={this.confirm} cancel={this.cancel} />}
+				<div className="flex jc-between" styleName='pay-box'>
+					<div styleName="pay-img"><img src={cart_info.icon} /></div>
+					<div className="flex-g-1">
+						<div className="flex jc-between">
+							<h4>{cart_info.name}</h4>
+							<div styleName="pay-num">数量{cart_info.number}</div>
+						</div>
+						<div className="flex wrap" styleName="pay-contrl">
+							{cart_info.deal_tags && cart_info.deal_tags.map((item, index) => {
+								return (<div key={index}>{item}</div>);
+							})}
+						</div>
+					</div>
+				</div>
+				<div styleName="pay-style">
+					<SelectRadioItem data={payment_list} value={payType} isClick={isClick} change={this.change} onChange={(id, name) => { this.setState({ payType: id, name: name }); this.payStyles(id); }} />
+				</div>
+				<div styleName="pay-btn">
+					<div styleName={isPass ? 'btn' : ''} onClick={() => { this.btnPay(payStyle.pay_action); }}>确认支付 ￥{total_price}</div>
+				</div>
+			</div>
+		);
+	}
+}
+
+export default PayPage;

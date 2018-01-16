@@ -1,0 +1,14 @@
+// 重置组件样式
+
+.am-navbar-light .am-navbar-title {
+	font-size: 32px !important;
+	color: #333 !important;
+}
+
+.am-navbar {
+	height: 75px !important;
+}
+
+.am-list-body {
+	background-color: transparent !important;
+}

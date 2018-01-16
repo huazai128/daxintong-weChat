@@ -1,0 +1,194 @@
+@import 'entry';
+
+:global{
+	.am-list-item.am-input-item{
+		height: 92px !important;
+	}
+	.am-list-item .am-input-label.am-input-label-5{
+		width: auto ;
+	}
+	.am-list-body::after{
+		height: 0 !important;
+		opacity: 0 !important;
+	}
+	.am-list-item.am-input-item{
+		padding-left: 20px !important;
+		background: #fff;
+	}
+	.am-list-item{
+		background: #f5f5f9 ;
+	}
+	.no-margin{
+		margin-right: 0 !important;
+	}
+	.send{
+		background-color: #ff9f00 !important;
+		color: #fff;
+	}
+	.account-from-box__2Six2 .account-topinput__3e2pG{
+		padding: 70px 20px 20px 20px !important;
+	}
+	.am-list-item .am-input-control input{
+		font-size: 28px;
+	}
+	.account-from-box__2Six2 .account-yanzheng__3aUr0{
+		font-size: 28px !important;
+	}
+}
+.from-box{
+	overflow: hidden;
+	position: relative;
+	.car{
+		height: 92px;
+		padding-bottom: 26px;
+	};
+	.one{
+		margin-bottom: 20px;
+		height: 92px;
+		background-color: #ffffff;
+		color: #b0b0b0;
+		font-size: 26px;
+	};
+	.carone{
+		display: inline-block;
+		// margin-right: 14px;
+		@include bgImg(120px, 60px, 'images/shouji.svg');
+	};
+	.login{
+		height: 92px;
+		padding-bottom: 26px;
+	};
+	.loginone{
+		margin:0 54px 0 24px;
+		height: 92px;
+		background-color: #ffffff;
+		color: #b0b0b0;
+		font-size: 26px;
+	};
+	.logintwo{
+		display: inline-block;
+		// margin-right: 14px;
+		@include bgImg(54px, 60px, 'images/suo.svg');
+	};
+	.xiaoyanma{
+		height: 92px;
+		padding:0px 18px 28px 0px;
+		margin-bottom: 20px;
+	};
+	.ma{
+		display: inline-block;
+		// margin-right: 14px;
+		@include bgImg(60px, 60px, 'images/xiaoyanma.svg');
+	};
+	.xiaoma{
+		height: 92px;
+		width: 250px;
+		text-align: center;
+		line-height: 92px;
+		// margin:0 54px 0 24px;
+	};
+	.xiaoone{
+		margin-right:20px;
+		height: 92px;
+		background-color: #ffffff;
+	};
+	.btn{
+		margin-top: 132px;
+		height: 88px;
+		background-color: #4794fe;
+		color: #ffffff;
+		text-align: center;
+		line-height: 88px;
+		border-radius: 10px;
+	font-size: 24px;
+	};
+	.psw{
+		font-size: 24px;
+		color: #999999;
+		padding: 25px;
+	};
+
+
+	.topinput{
+		padding:70px 18px 28px 20px;
+	};
+	.phonetop{
+		margin-right:20px;
+		height: 92px;
+		background-color: #ffffff;
+	}
+	.shouji{
+		display: inline-block;
+		width: 55px;
+		height: 55px;
+		background: url('images/shouji1.svg') no-repeat center;
+		background-size: 55px ;
+	};
+	.yanzheng{
+		height: 92px;
+		width: 250px;
+		background: #ddd;
+		text-align: center;
+		line-height: 92px;
+		border:0;
+		outline: 0;
+		color: #333;
+		font-size: 32px;
+	};
+	.message{
+		height: 92px;
+		padding-right: 20px;
+		padding-bottom: 26px;
+		margin-bottom: 20px;
+		margin-left: 20px;
+	};
+	.messageone{
+		margin-bottom: 20px;
+		height: 92px;
+		background-color: #ffffff;
+		color: #b0b0b0;
+		font-size: 26px;
+	}
+	.suo{
+		display: inline-block;
+		width: 55px;
+		height: 55px;
+		background: url('images/suo.svg') no-repeat center;
+		background-size: 35px ;
+	};
+	.xiaoyanma{
+		height: 92px;
+		margin-left: 20px;
+	};
+	.ma{
+		display: inline-block;
+		width: 55px;
+		height: 55px;
+		background: url('images/xiaoyanma.svg') no-repeat center ;
+		background-size: 48px ;
+	};
+	.xiaoma{
+		height: 92px;
+		width: 250px;
+		overflow: hidden;
+		> img{
+			width: 100%;
+			height: 100%;
+		}
+	};
+	.xiaoone{
+		// margin:0 54px 0 24px;
+			height: 92px;
+			background-color: #ffffff;
+	};
+	.btn{
+		margin-top: 132px;
+		height: 92px;
+		background-color: #4794fe;
+		color: #ffffff;
+		text-align: center;
+		line-height: 92px;
+		border-radius: 10px;
+		font-size: 32px;
+	};
+}

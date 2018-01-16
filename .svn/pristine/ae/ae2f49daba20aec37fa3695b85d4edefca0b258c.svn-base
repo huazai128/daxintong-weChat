@@ -1,0 +1,152 @@
+import React, { Component } from 'react';
+import { observer, inject } from 'mobx-react';
+import { Carousel, WhiteSpace, WingBlank, NavBar, Icon, Tabs } from 'antd-mobile';
+import CSSModules from 'react-css-modules';//是导入样式是使用的
+import styles from './coupon.scss';//是导入样式是使用的--
+import { urlAPi } from 'service/api';
+import { SubViewLink } from 'app/components/subViewLink/subViewLink';
+import { ListView, PullToRefresh } from 'antd-mobile';
+
+const row = CSSModules((rowData, rowID, self) => {
+	return (
+		<SubViewLink moduleName="teamBuy" key={rowID} title="团购券详情" modelData={{ id: rowData.coupon_id }} >
+			<div className="flex jc-between" styleName="shop-item" >
+				<div className="flex flex-g-1">
+					<div styleName="col-img"><img src={rowData.deal_icon} /></div>
+					<div className="flex-g-1" styleName="accoutone">
+						<div>
+							<h4>{rowData.name}</h4>
+							<div className="flex">
+								<p>购买数量:{rowData.number}</p>
+								<p>总价：￥{Number(rowData.unit_price * rowData.number).toFixed(2)}</p>
+							</div>
+							<p>过期时间：{rowData.end_time}</p>
+							<p>验证码: <span>{rowData.password}</span></p>
+						</div>
+					</div>
+				</div>
+				<div styleName='rightfont'></div>
+			</div>
+		</SubViewLink>
+	);
+}, require('./coupon.scss'));
+
+@CSSModules(styles, { allowMultiple: true })
+export default class extends Component {
+	constructor(props) {
+		super(props);
+		const dataSource = new ListView.DataSource({
+			rowHasChanged: (row1, row2) => row1 !== row2,
+		});
+		this.state = {
+			tag: 0,
+			page: 1,
+			couponLists: [],
+			pageObj: {},
+			dataSource,
+			isLoading: true,
+			hasMore: true,
+			tabs: [
+				{ title: '未使用', value: 0 },
+				{ title: '即将过期', value: 1 },
+				{ title: '已失效', value: 2 },
+				{ title: '已使用', value: 3 },
+			]
+		};
+	}
+	componentDidMount() {
+		const { page, tag } = this.state;
+		this.getCouponLists(page, tag);
+	}
+	getCouponLists = async (page, tag) => {
+		const res = await urlAPi.couponLists({ page: page, tag: tag });
+		if (Object.is(res.code, 0) && Object.is(res.message, 'ok')) {
+			const { item, page: pageObj } = res.result;
+			const data = [...this.state.couponLists, ...item];
+			this.setState({
+				dataSource: this.state.dataSource.cloneWithRows(data),
+				couponLists: data,
+				pageObj: pageObj,
+				isLoading: false,
+				hasMore: ((res.result.page <= page) ? false : true),
+				page: page
+			});
+		}
+	}
+	refresh=()=>{
+		this.setState({
+			loading: true,
+			hasMore:true,
+			couponLists:[]
+		});
+		const { page, tag } = this.state;
+		this.getCouponLists(page, tag);
+	}
+	change = (obj, index,isLoading) => {
+		if (isLoading) return false;
+		this.setState({
+			tag: index,
+			page: 1,
+			isLoading:true,
+			couponLists: [],
+			dataSource: this.state.dataSource.cloneWithRows([]),
+			pageObj: {}
+		});
+		this.getCouponLists(1, index);
+	}
+	loadMore = () => {
+		const { pageObj, hasMore, isLoading, page, tag } = this.state;
+		if (page >= pageObj.page_total) {
+			this.setState({
+				hasMore: false
+			});
+			return false;
+		}
+		if (isLoading) return false;
+		this.setState({
+			isLoading: true
+		});
+		let currentPage = page + 1;
+		this.getCouponLists(currentPage, tag);
+	}
+	render() {
+		const { couponLists, dataSource, tag, tabs, isLoading } = this.state;
+		return (
+			<div className="coupon-boxs flex-col">
+				<div className="flex coupon-nav">
+					{tabs && tabs.map((item, index) => {
+						return (<div key={index} className={`flex-g-1 ${tag === index ? 'active' : ''}`} onClick={() => { this.change(tabs, index,isLoading); }}>{item.title}</div>);
+					})}
+				</div>
+				<div className="flex-g-1 scroll-absolute" styleName="shop-bg">
+					<div>
+						{Array.from({ length: 4 }).map((item, index) => {
+							return (
+								Object.is(tag, index) && (
+									<ListView
+										key={index}
+										ref={el => this.lv = el}
+										dataSource={dataSource}
+										renderFooter={() => (<div style={{ padding: 30, textAlign: 'center' }}>
+											{isLoading ? '加载中...' : '没有更多数据加载了!'}
+										</div>)}
+										renderRow={row.bind(this)}
+										style={{
+											overflow: 'auto',
+										}}
+										pageSize={4}
+										onScroll={() => { }}
+										scrollRenderAheadDistance={200}
+										onEndReached={this.loadMore}
+										onEndReachedThreshold={50}
+									/>
+								)
+							);
+						})}
+
+					</div>
+				</div>
+			</div>
+		);
+	}
+}

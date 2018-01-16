@@ -1,0 +1,10 @@
+.icon {
+	display: inline-block;
+	text-align: center;
+	line-height: 32px;
+	height: 32px;
+	width: 32px;
+	border-radius: 4px;
+	color: #fff;
+	font-size: 24px;
+}

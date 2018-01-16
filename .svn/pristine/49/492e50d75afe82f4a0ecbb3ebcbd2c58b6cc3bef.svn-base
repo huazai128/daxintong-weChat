@@ -1,0 +1,13 @@
+:global{
+	.tu-box{
+		height: 92px;
+		width: 250px;
+		text-align: center;
+		line-height: 92px;
+		background: #e5e5e5;
+		> img{
+			width: 100%;
+			height: 100%;
+		}
+	};
+}

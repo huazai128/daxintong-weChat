@@ -1,0 +1,49 @@
+@function ptr($val) {
+	@return ($val/100px) * 1rem;
+}
+
+:global{
+	.hideView {
+		padding-left: ptr(25px);
+		font-size: ptr(30px);
+		color: #fff;
+		i,
+		span {
+			vertical-align: middle;
+		}
+	}
+	.paddingtop {
+		height: ptr(40px);
+		background-color: #3799F7;
+	}
+	.fw-header {
+		height: ptr(80px);
+		background-color: #3799F7;
+		color: #fff;
+		.right {
+			font-size: ptr(30px);
+			text-align: right;
+			padding-right: ptr(25px);
+		}
+		h1 {
+			font-size: ptr(34px);
+			font-weight: normal;
+			line-height: inherit;
+			margin: 0;
+			text-align: center;
+		}
+	}
+	.icon-back {
+		width: ptr(21px);
+		height: ptr(36px);
+		margin-right: ptr(7px);
+		display: inline-block;
+		background-repeat: no-repeat;
+		background-position: center center;
+		background-size: ptr(21px) ptr(36px);
+		background-image: url('/icon-back.png');
+	}
+	.blue {
+		color: #28ACB2;
+	}
+}

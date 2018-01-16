@@ -1,0 +1,9 @@
+:global{
+	.graphic-boxs{
+		background: #fff;
+		overflow: hidden;
+		> div{
+			padding: 0 20px;
+		}
+	}
+}

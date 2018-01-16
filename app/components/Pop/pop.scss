@@ -1,0 +1,45 @@
+:global{
+	.pop-box{
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(0,0,0,0.3);
+		z-index: 100;
+		.pop-content{
+			width: 100%;
+			.pop-show{
+				margin: 0 160px;
+				padding: 40px 50px 0 50px;
+				background: #fff;
+				border-radius: 12px;
+				> h3{
+					font-size: 32px;
+					font-weight: normal;
+					color: #333;
+					text-align: center;
+					margin: 0;
+					margin-bottom: 40px;
+				}
+				> .pop-btns{
+					text-align: center;
+					line-height: 64px;
+					height: 64px;
+					color: #31abfb;
+					font-size: 28px;
+					position: relative;
+					&::before{
+						position: absolute;
+						top: 0;
+						left: 50%;
+						width: 1px;
+						height: 100%;
+						background: #ddd;
+						content:'';
+					}
+				}
+			}
+		}
+	}
+}

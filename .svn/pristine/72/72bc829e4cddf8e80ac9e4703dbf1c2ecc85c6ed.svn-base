@@ -1,0 +1,41 @@
+import React,{ Component } from 'react';
+import { setStore,getStore,removeStore } from 'utils/store';
+import { hashHistory } from 'react-router';
+import { urlAPi } from 'service/api';
+import { Toast } from 'antd-mobile';
+import './blank.scss';
+
+export default class  extends Component {
+	constructor(props){
+		super(props);
+	}
+	componentDidMount() {
+		this.getOrderDetail();
+	}
+	getOrderDetail = async () => {
+		const { id } = this.props.params;
+		if (getStore('isStatus')) {
+			removeStore('isStatus');
+			hashHistory.push('/');
+			return false;
+		}
+		setStore('isStatus',true);
+		const res = await urlAPi.payOrder({ order_id: id });
+		if (Object.is(res.code, 0) && Object.is(res.message, 'ok')) {
+			const {  pay_status } = res.result;
+			Toast.loading('加载中...',3);
+			if (Object.is(pay_status, 0)) {
+				hashHistory.push('pay/' + id + '?flag=true');
+				return false;
+			}else if(Object.is(pay_status, 1)){
+				hashHistory.push('payed/' + id );
+			}
+		}
+	}
+	render() {
+		return (
+			<div className="blank-box">
+			</div>
+		);
+	}
+}

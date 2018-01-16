@@ -1,0 +1,29 @@
+{
+	"presets": [
+		"env",
+		"react",
+		"stage-0"
+	],
+	"plugins": [
+		"transform-decorators-legacy",
+		// "transform-runtime",
+		[
+			"import",
+			{
+				"libraryName": "antd-mobile",
+				"style": true
+			}
+		]
+	],
+	"env": {
+		// only enable it when process.env.NODE_ENV is 'development' or undefined
+		"development": {
+			"presets": [
+				"react-hmre"
+			]
+			// "plugins": [
+			// 	"react-hot-loader/babel"
+			// ]
+		}
+	}
+}

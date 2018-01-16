@@ -1,0 +1,84 @@
+.ev-box{
+	border-top: 1px solid #ddd;
+	.ev-star{
+		padding:50px 0;
+		text-align: center;
+		> p{
+			font-size: 28px;
+			color:#999;
+			margin: 0;
+		}
+		.rating{
+			position: relative;
+			width: 470px;
+			height: 84px;
+			.overfl{
+				overflow: hidden;
+				position: relative;
+				height: 100%;
+			}
+			.star{
+				position: absolute;
+				width: 470px;
+				height: 84px;
+				top: 0;
+				left: 0;
+			}
+			.icon{
+				display: block;
+				width: 84px;
+				height: 84px;
+				margin-right: 10px;
+				overflow: hidden;
+				font-size: 32px;
+				text-align: center;
+				& > img{
+					width: 84px;
+					height: 84px;
+				}
+			}
+		}
+		.psty{
+			font-size: 30px !important;
+			color:#fd9901 !important;
+			font-weight: 100;
+			padding-left: 10px !important;
+		}
+	}
+}
+
+.ev-text{
+	font-size: 24px;
+}
+.ev-btn{
+	width: 100%;
+	height: 90px;
+	background: #4794fe;
+	line-height: 90px;
+	text-align: center;
+	color: #fff;
+	font-size: 30px;
+	z-index: 10;
+}
+.upload-img{
+	padding: 20px;
+	background: #fff;
+}
+
+:global{
+	.am-image-picker-list .am-image-picker-upload-btn{
+		border: 6px dashed #999;
+	}
+	.am-image-picker-list .am-image-picker-upload-btn:before, .am-image-picker-list .am-image-picker-upload-btn:after{
+		width: 6px;
+	}
+	.am-image-picker-list .am-image-picker-upload-btn:after{
+		height: 6px;
+		width: 50px;
+	}
+	.am-textarea-control textarea{
+		font-size: 28px;
+		word-break: break-word !important;
+	}
+
+}

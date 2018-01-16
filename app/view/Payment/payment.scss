@@ -1,0 +1,125 @@
+@import 'entry';
+.tabs-box{
+	.item{
+		height: 200px;
+		padding: 30px 20px;
+		background: #fff;
+		border-bottom: 1px solid #ddd;
+		.order-info{
+			position: relative;
+			overflow:hidden;
+			&>div:first-child{
+				-webkit-overflow-scrolling: touch;
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				overflow-x: hidden;
+				overflow-y: auto;
+				.order-img{
+					width: 160px;
+					height: 130px;
+					margin-right: 20px;
+					overflow: hidden;
+					> img{
+						width: 100%;
+						height: 100%;
+					}
+				}
+				h4{
+					font-size: 28px;
+					margin-top: 10px;
+					color: #000000;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					display: -webkit-box;
+					-webkit-line-clamp: 1;
+					-webkit-box-orient: vertical;
+					margin:0;
+					max-width: 340px;
+					margin-bottom: 4px;
+				}
+				p{
+					font-size: 26px;
+					color: #999999;
+					padding: 10px 0 8px 0;
+				}
+				span{
+					display: block;
+					font-size: 26px;
+					padding: 5px 0 8px 0;
+					color: #999999;
+				}
+			}
+		}
+	}
+}
+:global{
+	.order-type{
+		margin-left: 10px;
+		width: 220px;
+		height: 100%;
+		h4{
+			font-size: 28px;
+			color: #333;
+			font-weight: normal;
+			margin: 0;
+			text-align: right;
+			margin-top: 20px;
+		}
+
+	}
+	.tabs{
+		.am-tabs-default-bar-tab{
+			font-size: 28px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap
+		}
+		.am-list-view-scrollview{
+			height: 100%;
+		}
+		.am-tabs-tab-bar-wrap {
+			position: relative;
+			width: 100%;
+			z-index: 10;
+		}
+	}
+	.order-dent{
+		position: relative;
+		.order-pos{
+			position: absolute;
+			right: 20px;
+			bottom: 40px;
+			.btn{
+				background: #fff;
+				font-size: 24px;
+				color: #ffa008;
+				padding: 0 12px;
+				height: 50px;
+				line-height: 50px;
+				border: 0;
+				outline: none;
+				&.btn-border{
+					border: 1px solid #ffa008;
+					border-radius: 6px;
+				}
+			}
+		}
+	}
+	.tabs-nav{
+		height:75px;
+		line-height: 75px;
+		overflow: hidden;
+		text-align: center;
+		background: #fff;
+		border-bottom: 1px solid #ddd;
+		> div {
+			font-size: 28px;
+			color: #333;
+			&.active{
+				color: #18a3f9;
+				border-bottom: 1px solid #18a3f9;
+			}
+		}
+	}
+}

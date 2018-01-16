@@ -1,0 +1,21 @@
+:global{
+	.cate-share{
+		width: 100%;
+		height: 80px;
+		position: relative;
+		&::before{
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 20px;
+			bottom: 0;
+			content: '';
+			background: url("~images/star-empty.svg") no-repeat right center !important;
+			background-size: 44px !important;
+		}
+		&.active:before{
+			background: url("~images/star01.svg") no-repeat right center !important;
+			background-size: 44px !important;
+		}
+	}
+}

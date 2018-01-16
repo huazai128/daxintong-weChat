@@ -1,0 +1,104 @@
+@mixin iconImg($width,$height,$icon){
+	background:url($icon) no-repeat center;
+	background-size: $width $height;
+}
+:global{
+	.form-bind{
+		.am-list{
+			padding: 50px 20px;
+		}
+		.form-group{
+			margin-bottom: 20px;
+		}
+		.am-list-item.am-input-item{
+			height: 92px !important;
+		}
+		.am-list-item .am-input-label.am-input-label-5{
+			width: auto ;
+		}
+		.am-list-item.am-input-item{
+			padding-left: 00px !important;
+			background: #fff;
+		}
+		.am-list-item .am-input-control input{
+			font-size: 28px;
+		}
+		.am-list-item{
+			background: #f5f5f9 ;
+		}
+		.from-btn{
+			width: 250px;
+			height: 92px;
+			margin-left: 20px;
+		}
+		.form-icon{
+			display: block;
+			width: 60px;
+			height: 92px;
+		}
+	}
+	.btn{
+		width: 100%;
+		height: 90px;
+		margin-top: 100px;
+		line-height: 90px;
+		text-align: center;
+		font-size: 32px;
+		color: #fff;
+		border: 0;
+		outline: none;
+		background: #4794fe;
+		border-radius: 12px;
+		&.send{
+			background: #e5e5e5;
+			color: #333;
+		}
+	}
+	.send-btn{
+		font-size: 32px;
+		color: #fff;
+		background: #ff9f00;
+		border: 0;
+		outline: none;
+	}
+	.test-img{
+		overflow: hidden;
+		> img{
+			width: 100%;
+			height: 100%;
+		}
+	}
+	.accoumt{
+		@include iconImg(46px,46px,'~images/card.svg');
+	}
+	.yanzheng{
+		height: 92px;
+		width: 250px;
+		background: #ddd;
+		text-align: center;
+		line-height: 92px;
+		border:0;
+		outline: 0;
+		color: #333;
+		font-size: 28px;
+		margin-left: 20px;
+		&.send{
+			color: #fff;
+			background: #ff9f00 !important;
+		}
+	};
+	.yu{
+		@include iconImg(46px,46px,'~images/shenfen.svg');
+	}
+	.name{
+		@include iconImg(42px,42px,'~images/ming.svg');
+	}
+	.phone{
+		@include iconImg(70px,70px,'~images/shouji1.svg');
+	}
+	.icon-ma{
+		@include iconImg(50px, 50px, '~images/xiaoyanma.svg');
+	}
+
+}
+

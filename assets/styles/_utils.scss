@@ -1,0 +1,9 @@
+@mixin bgImg($width, $height, $urlPath){
+	background-image: url($urlPath);
+	background-size: cover;
+	background-repeat: no-repeat;
+	width: $width;
+	height: $height;
+}
+
+

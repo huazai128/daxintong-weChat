@@ -1,0 +1,51 @@
+:global{
+	.dx-box{
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 99999;
+		background: rgba(0,0,0,0.01);
+		width: 100%;
+		height: 100%;
+		> div{
+			width: 100%;
+		}
+		.dx-pass{
+			background: #fff;
+			padding: 40px 20px;
+			margin: 0 50px;
+			border-radius: 10px;
+			.am-list-item .am-input-control input{
+				font-size: 28px;
+			}
+			& > h4{
+				font-size: 32px;
+				color: #333;
+				font-weight: normal;
+				text-align: center;
+				margin:0;
+				margin-bottom: 20px;
+			}
+			.dx-input{
+				height: 90px;
+				margin-bottom: 20px;
+			}
+			.dx-btns{
+				& > div {
+					margin: 0 20px;
+					text-align: center;
+					height: 80px;
+					line-height: 80px;
+					border-radius: 8px;
+					background: #ff9900;
+					font-size: 28px;
+					color: #fff;
+					&.cancel{
+						background: #e5e5e5;
+						color: #666;
+					}
+				}
+			}
+		}
+	}
+}

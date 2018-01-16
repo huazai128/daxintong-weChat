@@ -1,0 +1,46 @@
+
+:global{
+	.step-box{
+		padding: 10px 20px;
+		> p{
+			line-height: 60px;
+		}
+		.stepper-box{
+			border: 1px solid #ddd;
+			> div{
+				outline: none;
+				border:0;
+				width: 70px;
+				height: 62px;
+				line-height: 60px;
+				color: #333;
+				font-size: 46px;
+				text-align: center;
+				&.pro{
+					color: #666;
+					background: #e5e5e5;
+				}
+			}
+			.number{
+				width: 100px;
+				height: 60px;
+				border: 0;
+				outline: none;
+				text-align: center;
+				border-right: 1px solid #ddd;
+				border-left: 1px solid #ddd;
+			}
+		}
+		.am-list-item.am-input-item{
+			height: 60px !important;
+			padding:0 !important;
+			margin:0 !important;
+		}
+		.am-list-item{
+			min-height: 60px;
+			input{
+				text-align: center;
+			}
+		}
+	}
+}

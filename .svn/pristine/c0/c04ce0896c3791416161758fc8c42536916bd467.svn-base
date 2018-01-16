@@ -1,0 +1,208 @@
+.me-app{
+	width: 100%;
+	height: 110px;
+	background: url("images/my02.png") no-repeat center;
+	background-size: cover;
+	padding: 0 30px 0 40px;
+}
+.me-logo{
+	padding-left: 105px;
+	background: url("images/my01.png") no-repeat left center;
+	background-size: 84px;
+	p{
+		font-size: 26px;
+		color: #333;
+		margin: 0;
+		line-height: 1.7;
+		&:first-child{
+			padding-top: 10px;
+		}
+	}
+}
+.app-upload{
+	display: block;
+	height: 60px;
+	width: 180px;
+	text-align: center;
+	line-height: 60px;
+	border: 1px solid #18a2fa;
+	color: #18a2fa;
+	font-size: 28px;
+	border-radius: 10px;
+	margin-top:24px;
+}
+.me-detail{
+	padding: 35px 35px 35px 20px;
+	background: #4794fe;
+}
+.head{
+	margin-bottom: 85px;
+	.return{
+		width: 55px;
+		height: 55px;
+		background: url("images/icon-return.png") no-repeat left center;
+		background-size: 23px 39px;
+	}
+	h4{
+		font-size: 48px;
+		color: #fff;
+		margin: 0;
+		text-align: center;
+		font-weight: normal;
+	}
+}
+.info{
+	padding-left: 30px;
+	p{
+		margin: 0;
+		font-size: 24px;
+		color: #fff;
+		line-height: 1.7;
+		&:first-child{
+			margin-top: 20px;
+		}
+	}
+}
+.avatar{
+	width: 120px;
+	height: 120px;
+	border-radius: 50%;
+	border: 2px solid #fff;
+	background: #f5f5f9;
+	position: relative;
+	& > input {
+		position: absolute;
+		top: 0;
+		left: 0;
+		opacity: 0;
+		width: 100%;
+		height: 100%;
+		border-radius: 50%;
+	}
+	> img{
+		width: 120px;
+		height: 120px;
+		border-radius: 50%;
+		overflow: hidden;
+	}
+}
+.detail{
+	font-size: 26px;
+	height: 120px;
+	line-height: 120px;
+	width: 100px;
+	font-size: 30px;
+	text-align: right;
+	color: #fff;
+}
+
+.order{
+	background: #fff;
+	margin-bottom: 30px;
+	.order-head{
+		height: 75px;
+		line-height: 75px;
+		padding: 0 20px;
+		border-bottom: 1px solid #f5f5f5;
+		> h4{
+			margin: 0;
+			font-size: 34px;
+			color: #333;
+			font-weight: normal;
+		}
+		> div {
+			font-size: 24px;
+			color: #c3c3c3;
+			padding-right: 30px;
+			position: relative;
+			text-align: right;
+			background: url('images/arrow_down.svg')no-repeat right center;
+			background-size: 22px  30px;
+		}
+	}
+}
+
+:global {
+	.icon-group{
+		> div{
+			width: 25%;
+			height: 160px;
+		}
+		.me-icon{
+			height: 50px;
+			position: relative;
+			padding-top: 110px;
+			text-align: center;
+			font-size: 24px;
+			color: #c3c3c3;
+			> p {
+				position: absolute;
+				top: 0;
+				width: 36px;
+				height: 36px;
+				border-radius: 50%;
+				background: #fd0000;
+				line-height: 36px;
+				color: #fff;
+				text-align: center;
+				font-size: 22px;
+				top:22px;
+				right: 20px;
+			}
+			&.pay{
+				background: url("~images/pay.png") no-repeat center 45px;
+				background-size: 51px 44px;
+			}
+			&.user{
+				background: url("~images/user.png") no-repeat center 45px;
+				background-size: 46px 44px;
+			}
+			&.comment{
+				background: url("~images/comment.png") no-repeat center 45px;
+				background-size: 46px 42px;
+			}
+			&.refund{
+				background: url("~images/refund.png") no-repeat center 45px;
+				background-size: 53px 49px;
+			}
+		}
+	}
+
+}
+
+.me-box{
+	background: #fff;
+}
+:global {
+
+	.me-btn{
+		height: 204px;
+		padding-top: 120px;
+		text-align: center;
+		border-bottom: 1px solid #eee;
+		border-right: 1px solid #eee;
+		font-size: 26px;
+		color: #333;
+		box-sizing: border-box;
+		&:nth-child(3n){
+			border-right: 0;
+		}
+		&.collect{
+			background: url("~images/collect.png") no-repeat center 56px;
+			background-size: 44px 42px;
+		}
+		&.mycom{
+			background: url("~images/mycom.png") no-repeat center 60px;
+			background-size: 47px 42px;
+		}
+		&.daxin{
+			background: url("~images/daxin.png") no-repeat center 70px;
+			background-size: 45px 32px;
+		}
+		&.tuan{
+			background: url("~images/tuan.png") no-repeat center 70px;
+			background-size: 45px 31px;
+		}
+	}
+}
+

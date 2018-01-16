@@ -1,0 +1,145 @@
+import React, { Component } from 'react';
+import CSSModules from 'react-css-modules';
+import { ListView, PullToRefresh } from 'antd-mobile';
+import RatingStar from 'components/RatingStar/star';
+import styles from './comments.scss';
+import { urlAPi } from 'service/api';
+import { SubViewLink } from 'app/components/subViewLink/subViewLink';
+import ConfirmButton from 'components/ConfirmButton/';
+import CommentItem from 'components/CommentItem';
+let wx = window.wx;
+
+@CSSModules(styles)
+class RowData extends Component {
+	constructor(props) {
+		super(props);
+	}
+	// 图片预览
+	showImg = (img, arrImg) => {
+		wx.ready(() => {
+			wx.previewImage({
+				current: img, // 当前显示图片的http链接
+				urls: arrImg // 需要预览的图片http链接列表
+			});
+		});
+	}
+	render() {
+		const { rowData, rowID } = this.props;
+		return (
+			<div styleName="item" key={rowID} className="flex">
+				<div styleName="avatar"><img src={rowData.user_avatar} /></div>
+				<div styleName="myc-content" className="flex-g-1">
+					<h4>{rowData.user_name}</h4>
+					<div className="mt5 flex mb5"><span>评级</span><RatingStar star={rowData.point} isHide={true}></RatingStar></div>
+					<div styleName="myc-com" className="mb10"> {'评价 ' + rowData.content}</div>
+					<div styleName="pswiper-box">
+						{rowData && rowData.oimages && rowData.oimages.length > 0 && <div className="flex" > {rowData.oimages.slice(0, 4).map((item, index) => {
+							return (
+								<img className="mr10 mb10" key={index} src={item} onClick={() => { this.showImg(item, rowData.oimages); }} />
+							);
+						})}</div>}
+						{rowData && rowData.images && rowData.images.length > 4 ? <div styleName="psweiper-num">{rowData.images.length}</div> : null}
+					</div>
+					<p styleName="create-time">{rowData.create_time}</p>
+					<SubViewLink moduleName='cateDetail' title="团购详情" modelData={{ id: rowData.data_id }} confirmButtonHtml={<ConfirmButton onChange={(value) => { rowData.is_collect = value; }} id={rowData.data_id} item={rowData} isCollect={rowData.is_collect} />}>
+						<div styleName="myc-detail" className="flex mt25">
+							<div styleName="myc-img"><img src={rowData.icon} /></div>
+							<div className="flex-g-1">
+								<p>{rowData.name}</p>
+								<span>购买金额：{rowData.current_price}元</span>
+							</div>
+						</div>
+					</SubViewLink>
+				</div>
+			</div>
+		);
+	}
+}
+
+@CSSModules(styles)
+class MyComments extends Component {
+	constructor(props) {
+		super(props);
+		const dataSource = new ListView.DataSource({
+			rowHasChanged: (row1, row2) => row1 !== row2,
+		});
+		this.state = {
+			page: 1,
+			lists: [],
+			pageObj: {},
+			dataSource,
+			isLoading: true,
+			hasMore: true
+		};
+	}
+	componentDidMount() {
+		this.getComments(1);
+	}
+	update = () => {
+		this.getComments(1);
+	}
+	getComments = async (page) => {
+		const params = { page: page, type: 'deal' };
+		const res = await urlAPi.myComments(params);
+		this.setState({
+			isLoading: false,
+		});
+		if (Object.is(res.code, 0) && Object.is(res.message, 'ok')) {
+			const { item } = res.result;
+			const data = [...this.state.lists, ...item];
+			this.setState({
+				pageObj: res.result.page,
+				dataSource: this.state.dataSource.cloneWithRows(data),
+				lists: data,
+				hasMore: ((res.result.page <= page) ? false : true),
+				page: page
+			});
+		}
+	}
+	loadMore = () => {
+		const { pageObj, hasMore, isLoading, page } = this.state;
+		if (page >= pageObj.page_total) {
+			this.setState({
+				hasMore: false
+			});
+			return false;
+		}
+		if (isLoading) return false;
+		this.setState({
+			isLoading: true
+		});
+		let currentPage = page + 1;
+		this.getComments(currentPage);
+	}
+
+	render() {
+		const { page, dataSource, isLoading } = this.state;
+		const rowData = (rowData, rowID) => {
+			return (<RowData rowData={rowData} rowID={rowID}></RowData>);
+		};
+		return (
+			<div className="myc-box">
+				<div styleName="myc-items" className="scoller-absolute" >
+					<ListView
+						dataSource={dataSource}
+						renderRow={rowData}
+						pageSize={10}
+						onScroll={() => { }}
+						scrollRenderAheadDistance={200}
+						onEndReached={this.loadMore}
+						onEndReachedThreshold={50}
+						ref={el => this.lv = el}
+						renderFooter={() => (<div style={{ textAlign: 'center' }}>
+							{isLoading ? '加载中...' : '没有更多数据加载了!'}
+						</div>)}
+						style={{
+							overflow: 'auto',
+						}}
+						onLayout={({ nativeEvent: { layout: { width, height } } }) => { }}
+					/>
+				</div>
+			</div>
+		);
+	}
+}
+export default MyComments;

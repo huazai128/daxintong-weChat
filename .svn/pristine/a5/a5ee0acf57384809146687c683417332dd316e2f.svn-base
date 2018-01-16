@@ -1,0 +1,33 @@
+
+:global {
+	.am-search{
+		height: 80px;
+	}
+	.am-search-input {
+		border-radius: 50px;
+	}
+	.hisLists{
+		& > div{
+			& > div {
+				display: block;
+				border-bottom: 1px solid #ddd;
+				background: #fff;
+				color: #666;
+				font-size: 28px;
+				border-radius: 6px;
+				padding: 20px;
+			}
+		}
+	}
+	.remove-history{
+		text-align: center;
+		padding: 20px;
+		color: #333;
+		font-size: 28px;
+		color: #666;
+		background: #fff;
+	}
+	.am-search-input .am-search-synthetic-ph{
+		transition: width 0s !important;
+	}
+}

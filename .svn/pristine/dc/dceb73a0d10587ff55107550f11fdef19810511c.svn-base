@@ -1,0 +1,11 @@
+export const forDate = (t) => {
+	if(typeof t !== 'number') return false;
+	if(t <= 0){
+		return false;
+	}
+	let seconds = Math.floor((t / 1000) % 60);
+	let minutes = Math.floor((t / 1000 / 60) % 60);
+	let hours = Math.floor((t / (1000 * 60 * 60)) % 24);
+	let days = Math.floor(t / (1000 * 60 * 60 * 24));
+	return `${ days }${hours}小时${ minutes }分${ seconds }秒`;
+};

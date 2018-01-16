@@ -1,0 +1,282 @@
+import React, { Component } from 'react';
+// import { observer, inject } from 'mobx-react';
+import { Carousel, Icon, Toast } from 'antd-mobile';
+import CSSModules from 'react-css-modules';//是导入样式是使用的
+import styles from './cateDetail.scss';//是导入样式是使用的--》这个需要使用对象的形式的去到
+import RatingStar from 'components/RatingStar/star';
+import Recommend from 'components/Recommend/recommend';
+import CommentItem from 'components/CommentItem';
+import { urlAPi } from 'service/api';
+import { hashHistory } from 'react-router';
+import { SubViewLink, subViewHandle } from 'app/components/subViewLink/subViewLink';
+import ConfirmHtml from 'components/ConfirmHtml/';
+import { getStore, setStore } from 'utils/store';
+import { meter } from 'utils/meter';
+import Nav from 'components/Navtwo';
+import { forDate } from 'utils/moment';
+const wx = window.wx;
+
+@CSSModules(styles)
+export default class extends Component {
+	constructor() {
+		super();
+		this.state = {
+			deal_info: {},
+			comment_lists: [],
+			shopInfo: [],
+			otherShop: [],
+			isLoad: true,
+			len: 2,
+			imgHeight: 450,
+			isMore: true,
+			isNav: false,
+			isBtn: false,
+			time: '',
+			timer:null
+		};
+	}
+	// 初始化触发
+	componentDidMount() {
+		let id = this.props.params ? this.props.params.id : this.props.modelData.id;
+		if (this.props.params && this.props.params.id) {
+			this.setState({
+				isNav: true
+			});
+		}
+		let locat = JSON.parse(getStore('location'));
+		const params = {
+			data_id: id,
+			m_longitude: locat ? locat.longitude : '',
+			m_latitude: locat ? locat.latitude : ''
+		};
+		urlAPi.getCateDetail(params).then((res) => {
+			if (Object.is(res.result.user_login_status, 1)) {
+				setStore('isLogin', true);
+			} else {
+				setStore('isLogin', false);
+			}
+			if (Object.is(res.code, 0)) {
+				const { id, name, icon, sub_name } = res.result.deal_info;
+				this.setState({
+					deal_info: res.result.deal_info, // 商家信息
+					comment_lists: res.result.dp_list, // 评论信息
+					shopInfo: res.result.supplier_location_list, // 商家信息
+					otherShop: res.result.other_deal, // 推荐商品
+					loginStatus: res.result.user_login_status
+				});
+				this.share(id, name, icon, sub_name);
+			}
+			this.getServerTime(res.result.deal_info.last_time);
+			setTimeout(() => {
+				this.setState({
+					isBtn: true
+				});
+			});
+		});
+	}
+	share = (id, title, imgUrl, sub_name) => {
+		let url = location.href.split('#')[0];
+		wx.ready(() => {
+			let shareData = {
+				title: title,
+				desc: sub_name,
+				link: `${url}#/cateDetail/${id}`,
+				imgUrl: imgUrl
+			};
+			wx.onMenuShareAppMessage(shareData);
+			wx.onMenuShareTimeline(shareData);
+			wx.onMenuShareQQ(shareData);
+			wx.onMenuShareWeibo(shareData);
+			wx.onMenuShareQZone(shareData);
+		});
+	}
+	orderBtn = (data_id, deal_info, loginStatus, time_status) => {
+		if (Object.is(time_status, 2)) {
+			Toast.info('已过团购时间', 3);
+			return false;
+		}
+		if (Object.is(time_status, 0)) {
+			Toast.info('团购还未开始', 3);
+			return false;
+		}
+		const { isBtn } = this.state;
+		if (!isBtn) return false;
+		subViewHandle.pushView('order', {
+			title: '提交订单',
+			modelData: {
+				deal_id: data_id,
+				loginStatus: loginStatus,
+			}
+		});
+	}
+	more = (len) => {
+		this.setState({
+			isMore: !this.state.isMore,
+			len: this.state.isMore ? len : 2
+		});
+	}
+	noPhone = () => {
+		Toast.info('无电话号码', 2);
+	}
+	getServerTime = (t) => {
+		let timer = null;
+		timer = setInterval(() => {
+			t = Number(t) - 1;
+			if (t <= 0) {
+				clearInterval(timer);
+				return false;
+			}
+			let time = forDate(t);
+			this.setState({
+				time: time
+			});
+		}, 1000);
+		this.setState({
+			timer:timer
+		});
+	}
+	componentWillUnmount(){
+		clearInterval(this.state.timer);
+		this.setState({
+			timer:null
+		});
+	}
+	render() {
+		const { deal_info, comment_lists, shopInfo, otherShop, imgHeight, loginStatus, len, isMore, isNav, time } = this.state;
+		let data_id = this.props.params ? this.props.params.id : this.props.modelData.id;
+		let contentNotes;
+		return (
+			<div styleName='taungou' className="flex-col">
+				{isNav && <Nav>团购详情</Nav>}
+				<div className="flex-g-1 scroll-absolute">
+					<div>
+						<div styleName="swiper-box" className="swiper-container">
+							<Carousel
+								autoplay={true}
+								infinite
+								selectedIndex={0}
+								beforeChange={(from, to) => { }}
+								afterChange={index => { }}>
+								{deal_info.images && deal_info.images.map((item, index) => {
+									return (
+										<a key={index}>
+											<img
+												src={item}
+												style={{ width: '100%' }}
+												onLoad={() => {
+													window.dispatchEvent(new Event('resize'));
+												}}
+											/>
+										</a>
+									);
+								})}
+							</Carousel>
+							<div styleName="swper-name"><p>{deal_info.sub_name}</p></div>
+						</div>
+						{/* 下单 */}
+						<ul className='flex jc-between' styleName='ulone'>
+							<li styleName='leftone'><span styleName='leftyuan'>￥</span>{deal_info.current_price}</li>
+							<li styleName='centertwo'>最高门市价：￥{deal_info.origin_price}</li>
+							<li styleName='rightthree' className={Object.is(deal_info.time_status, 1) ? '' : 'no-order'} onClick={() => { this.orderBtn(data_id, deal_info, loginStatus, deal_info.time_status); }}>下单</li>
+						</ul>
+						{/* 随时退 */}
+						<div styleName='tui-db' className="mb20">
+							<div styleName="tui-detail" className="flex wrap">
+								{deal_info.deal_tags && deal_info.deal_tags.map((item, index) => {
+									return (
+										<p className="flex-vcenter flex-col-4" key={index} ><i styleName="suitui"></i>{item}</p>
+									);
+								})}
+								<p className="flex-vcenter font-gray flex-col-4"><i styleName="yishou"></i>已售{deal_info.buy_count}</p>
+								{forDate(deal_info.last_time) && (<p className="flex-vcenter font-gray flex-col-8"><i styleName="day"></i>{time}</p>)}
+							</div>
+						</div>
+						{/* 评分 */}
+						{deal_info.dp_count > 0 && <div styleName='xing' className="mb20" >
+							<SubViewLink moduleName="commnents" title="评论列表" modelData={{ data_id: data_id, type: 'deal' }}>
+								<div className="flex jc-between" styleName="xingcenter">
+									<div><RatingStar star={deal_info.avg_point || 0} isHide={true}></RatingStar></div>
+									<div>{deal_info.dp_count}人评分</div>
+								</div>
+							</SubViewLink>
+						</div>
+						}
+						{/* 商家信息 */}
+						<div styleName='message'>商家信息</div>
+						<div className="mb20">
+							{shopInfo && shopInfo.slice(0, len).map((item, index) => {
+								return (
+									<div key={index} >
+										<div className="flex " styleName='haigui'>
+											<div styleName="lefthai" className="flex-g-1">
+												<SubViewLink moduleName="business" title="商家详情" modelData={{ id: item.id }} confirmButtonHtml={<ConfirmHtml id={item.id} isCollect={item.is_collect} />}>
+													<h3 styleName='haitop'>{item.name}</h3>
+													<p styleName='address'>{item.address}</p>
+													<a href="#" styleName='dingweifont'>{meter(item.distance)}</a>
+												</SubViewLink>
+											</div>
+											{item.tel && (<a href={`tel:${item.tel}`} styleName="rightphone"></a>)}
+											{!item.tel && (<div onClick={this.noPhone} styleName="rightphone"></div>)}
+										</div>
+									</div>
+								);
+							})}
+							{shopInfo && shopInfo.length > 2 && <div className='flex-center more-len' onClick={() => { this.more(shopInfo.length); }}>{!isMore ? '收起' : `查看其它${shopInfo.length - 2}条团购`}</div>}
+						</div>
+						<div styleName="tuan-detail" className="mb20">
+							<p>套餐详情</p>
+							<div styleName="shop-lists">
+								<div className="package-text" dangerouslySetInnerHTML={{
+									__html: deal_info.package_info && deal_info.package_info.replace(/\d+(\.\d+)?px/g, function (s, t) {
+										s = s.replace('px', '');
+										var value = Number(s) * 0.018;//   此处 1rem =120px
+										return value + 'rem ';
+									})
+								}} />
+							</div>
+							<div styleName="img-detail">
+								<SubViewLink moduleName="graphic" title="图文详情" modelData={{ id: data_id }}>查看图文详情 ></SubViewLink>
+							</div>
+						</div>
+						{/* 购物须知 */}
+						<div styleName='shopping'>购买须知</div>
+						{/* 使用规则 */}
+						<div className="notes-text" dangerouslySetInnerHTML={{
+							__html: deal_info.notes && deal_info.notes.replace(/\d+(\.\d+)?px/g, function (s, t) {
+								s = s.replace('px', '');
+								var value = Number(s) * 0.02;//   此处 1rem =120px
+								return value + 'rem ';
+							})
+						}} />
+						<div styleName="bus-comment" className="mb20">
+							{comment_lists && comment_lists.length > 0 && (
+								<SubViewLink moduleName="commnents" title="评论列表" modelData={{ data_id: data_id, type: 'deal' }}>
+									<div className="flex jc-end flex-vcenter cate-comments">
+										<div className="flex-g-1"><RatingStar star={deal_info.avg_point || 0}>分</RatingStar></div>
+										<div className="cate-more">{deal_info.dp_count}条评价</div>
+									</div>
+								</SubViewLink>
+							)}
+							<div >
+								{comment_lists && comment_lists.slice(0, 10).map((item, index) => (
+									<CommentItem key={index} datas={item} status={true}></CommentItem>
+								))}
+							</div>
+							{comment_lists && comment_lists.length > 0 && (<SubViewLink moduleName="commnents" title="评论列表" modelData={{ data_id: data_id, type: 'deal' }}><div styleName="bus-btn" className="flex jc-between">
+								<p>查看全部用户评价</p>
+								<div>共{deal_info.dp_count}条</div>
+							</div></SubViewLink>)}
+
+							{comment_lists && comment_lists.length == 0 && (
+								<p styleName="no-comments">暂无评论</p>
+							)}
+						</div>
+						<div>
+							{otherShop && <Recommend title="为您推荐" datas={otherShop}></Recommend>}
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+	}
+}
