@@ -5,8 +5,8 @@ import styles from './login.scss';//是导入样式是使用的--
 import Nav from 'components/Navfour';
 import Account from 'components/Account';
 import LoginMobile from 'components/LoginMobile/mobile';
-import { SubViewLink,subViewHandle } from 'app/components/subViewLink/subViewLink';
-import { getStore,setStore,removeStore } from 'utils/store';
+import { SubViewLink, subViewHandle } from 'app/components/subViewLink/subViewLink';
+import { getStore, setStore, removeStore } from 'utils/store';
 import { API_HOST } from 'utils';
 import { urlAPi } from 'service/api';
 import { hashHistory } from 'react-router';
@@ -22,40 +22,40 @@ export default class extends Component {
 				{ title: '手机快捷登录' },
 				{ title: '账号密码登录' },
 			],
-			deal_id:''
+			deal_id: ''
 		};
 	}
 	// 初始化
-	componentDidMount(){
-		if(this.props.location && this.props.location.query){
+	componentDidMount() {
+		if (this.props.location && this.props.location.query) {
 			const { deal_id } = this.props.location.query;
-			if(deal_id){
+			if (deal_id) {
 				this.setState({
-					deal_id:deal_id
+					deal_id: deal_id
 				});
 			}
 		}
-		if(getStore('wxLogin')){
+		if (getStore('wxLogin')) {
 			this.getWeixinstatus();
 		}
 	}
 	// 导航改变
-	change = (tabs,index) => {
-		if(this.state.idx === index) return false;
+	change = (tabs, index) => {
+		if (this.state.idx === index) return false;
 		this.setState({
 			idx: index,
-			tabs:tabs
+			tabs: tabs
 		});
 	}
 	// 使用微信登录
 	wxLogin = () => {
-		setStore('wxLogin',true);
+		setStore('wxLogin', true);
 		let redirect_url = location.href.split('#')[0];
 		const url = encodeURIComponent(`${redirect_url}#/login`);
 		const sess_id = getStore('sess_id');
 		window.location.href = `${API_HOST}?ctl=synclogin&act=oauth&sess_id=${sess_id}&redirect_url=${url}`;
 	}
-	componentWillReceiveProps(){
+	componentWillReceiveProps() {
 
 	}
 	// 是否完善手机号
@@ -63,35 +63,44 @@ export default class extends Component {
 		const res = await urlAPi.getWeixinstatus();
 		Toast.info(res.message, 2, null, false);
 		removeStore('wxLogin');
-		if(Object.is(res.code,0)){
-			if(Object.is(res.result.is_jump_mobile,0)){
-				setStore('isLogin',true);
-				setStore('userId',res.sess_id);
+		if (Object.is(res.code, 0)) {
+			if (Object.is(res.result.is_jump_mobile, 0)) {
+				setStore('isLogin', true);
+				setStore('userId', res.sess_id);
 				hashHistory.push('/me');
-			}else{
-				subViewHandle.replaceView('wxLogin',{
-					title:'绑定手机号码'});
+			} else {
+				subViewHandle.replaceView('wxLogin', {
+					title: '绑定手机号码'
+				});
 			}
 		}
 	}
 	render() {
-		const { idx, tabs,deal_id } = this.state;
+		const { idx, tabs, deal_id } = this.state;
 		return (
 			<div className="login-form">
-				<Nav>登录</Nav>
+				<div className="login-nav">
+					<h4>登录</h4>
+					<div>
+						<SubViewLink moduleName="register" title="注册" modelData={{ store: this.props.login }}>
+							<span style={{ display: 'block', width: '100%', height: '100%', lineHeight: '80px', textAlign: 'right', color: '#333333' }}>注册</span>
+						</SubViewLink>
+					</div>
+				</div>
+				{/* <Nav>登录</Nav> */}
 				<div className="flex coll-nav">
-					{ tabs && tabs.map((item,index) => {
-						return (<div key={index} className={ `flex-g-1 ${ idx === index ? 'active':'' }` } onClick={() => {this.change(tabs,index);} }>{ item.title }</div>);
-					}) }
+					{tabs && tabs.map((item, index) => {
+						return (<div key={index} className={`flex-g-1 ${idx === index ? 'active' : ''}`} onClick={() => { this.change(tabs, index); }}>{item.title}</div>);
+					})}
 				</div>
 				<div className="login-top">
 					<div>
-						{ Object.is(idx,0) && (
+						{Object.is(idx, 0) && (
 							<Account order={deal_id} ></Account>
-						) }
-						{ Object.is(idx,1) && (
+						)}
+						{Object.is(idx, 1) && (
 							<LoginMobile order={deal_id}></LoginMobile>
-						) }
+						)}
 					</div>
 					<div className="flex -jc-end">
 						<div className="flex-g-1">
@@ -99,7 +108,7 @@ export default class extends Component {
 								<div styleName='psw'>忘记密码</div>
 							</SubViewLink>
 						</div>
-						<div styleName="wx-login" onClick={ this.wxLogin }>
+						<div styleName="wx-login" onClick={this.wxLogin}>
 							使用微信登录
 						</div>
 					</div>

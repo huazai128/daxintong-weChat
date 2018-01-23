@@ -1,0 +1,161 @@
+import React, { Component } from 'react';
+import CSSModules from 'react-css-modules';
+import RatingStar from 'components/RatingStar/star';
+import Nav from 'components/Nav';
+import CommentItem from 'components/CommentItem';
+import { ListView } from 'antd-mobile';
+import { urlAPi } from 'service/api';
+import { SubViewLink } from 'app/components/subViewLink/subViewLink';
+
+@CSSModules(require('./index.scss'))
+export default class extends Component {
+	constructor(props){
+		super(props);
+		const dataSource = new ListView.DataSource({
+			rowHasChanged: (row1, row2) => row1 !== row2,
+		});
+		this.state = {
+			page:1,
+			result:{},
+			dataSource: dataSource,
+			isLogin: 0,
+			lists:[],
+			isLoading:true,
+			hasMore:true,
+			pageInfo:{},
+			isOpen:false,
+			imgData:[]
+		};
+	}
+	componentDidMount(){
+		const { page } = this.state;
+		this.getComments(page);
+	}
+	getComments = async (page) => {
+		const params = this.props.modelData;
+		params.page = page;
+		const res = await urlAPi.commentLists(params);
+		if(Object.is(res.code,0)){
+			const data = [...this.state.lists, ...res.result.item];
+			this.setState({
+				result:res.result,
+				lists:res.result.item,
+				isLogin: res.result.user_login_status,
+				pageInfo:res.result.page,
+				hasMore: (res.result.page.page_total <= page) ? false : true,
+				dataSource: this.state.dataSource.cloneWithRows(data),
+				page:page
+			});
+		}
+		this.setState({
+			isLoading:false
+		});
+	}
+	loadMore =() => {
+		const { pageInfo, hasMore, isLoading, page } = this.state;
+		if (page >= pageInfo.page_total) {
+			this.setState({
+				hasMore: false
+			});
+			return false;
+		}
+		if (isLoading) return false;
+		this.setState({
+			isLoading: true
+		});
+		let currentPage = page + 1;
+		this.getComments( currentPage);
+	}
+	onChange=(imgData)=>{
+		this.setState({isOpen:true, imgData:imgData});
+	}
+	handleClose = () => {
+		this.setState({
+			isOpen:true
+		});
+	}
+	render() {
+		const { result,isLogin,isLoading,dataSource,isOpen,imgData,hasMore } = this.state;
+		const row = (rowData, rowID, ) => {
+			return(
+				<div key={rowID} className="pr20 pl20">
+					<CommentItem datas={rowData} status={true} onChange={this.onChange}></CommentItem>
+				</div>
+			);
+		};
+		return (
+			<div styleName="comment-box" className="flex-col">
+				<div styleName="comment-content " className="borderTop">
+					<div styleName="comment-head" className="flex jc-around">
+						<div styleName="comment-num">
+							<h3>{ result.buy_dp_avg }</h3>
+							<p>{ result.message_count }</p>
+							<RatingStar star={result.buy_dp_avg} isHide={true}></RatingStar>
+						</div>
+						<div className="flex-g-1">
+							<div styleName="grade-lists" className="flex">
+								<div styleName="grade-star">5星</div>
+								<div styleName="grade-box">
+									<div styleName="grade-width" style={{ width: result.star_dp_width_5 +'%' }}></div>
+								</div>
+								<div className="flex-g-1" styleName="grade-star">{result.star_5}</div>
+							</div>
+							<div styleName="grade-lists" className="flex">
+								<div styleName="grade-star">4星</div>
+								<div styleName="grade-box">
+									<div styleName="grade-width" style={{ width: result.star_dp_width_4 +'%' }}></div>
+								</div>
+								<div className="flex-g-1" styleName="grade-star">{result.star_4}</div>
+							</div>
+							<div styleName="grade-lists"  className="flex">
+								<div styleName="grade-star">3星</div>
+								<div styleName="grade-box">
+									<div styleName="grade-width" style={{ width: result.star_dp_width_3 +'%' }}></div>
+								</div>
+								<div className="flex-g-1" styleName="grade-star">{result.star_3}</div>
+							</div>
+							<div styleName="grade-lists"  className="flex">
+								<div styleName="grade-star">2星</div>
+								<div styleName="grade-box">
+									<div styleName="grade-width" style={{ width: result.star_dp_width_2 +'%' }}></div>
+								</div>
+								<div className="flex-g-1" styleName="grade-star">{result.star_2}</div>
+							</div>
+							<div styleName="grade-lists" className="flex">
+								<div styleName="grade-star">1星</div>
+								<div styleName="grade-box">
+									<div styleName="grade-width" style={{ width: result.star_dp_width_1 +'%' }}></div>
+								</div>
+								<div className="flex-g-1" styleName="grade-star">{result.star_1}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div className="flex-g-1 scroll-absolute" styleName="comment-lists">
+					<div>
+						<ListView
+							ref={el => this.lv = el}
+							renderFooter={() => (<div style={{ textAlign: 'center' }}>
+								{ isLoading ? '加载中...' :  !hasMore ? '没有更多内容加载了':''}
+							</div>)}
+							style={{
+								height: '100%',
+								overflow: 'auto',
+							}}
+							onEndReached={this.loadMore}
+							dataSource={dataSource}
+							renderRow={row}
+							pageSize={4}
+							onScroll={() => { }}
+							scrollRenderAheadDistance={100}
+							onEndReachedThreshold={50}
+						/>
+						{ result.item && result.item.length == 0 && (
+							<p className="comments-not">暂无评论!</p>
+						) }
+					</div>
+				</div>
+			</div>
+		);
+	}
+}
