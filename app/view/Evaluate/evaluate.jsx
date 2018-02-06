@@ -23,10 +23,13 @@ class Evaluate extends Component {
 			multiple: false,
 			isBtn: false,
 			isFormat: false,
-			imgs: []
+			imgs: [],
+			len: 0,
+			hei: 0
 		};
 	}
 	componentDidMount() {
+
 	}
 	addEvaluate = async () => {
 		const { data_id, type, } = this.props.modelData;
@@ -55,36 +58,51 @@ class Evaluate extends Component {
 			type: type,
 			content: content,
 			point: star,
-			'file[]': files.map((item) => item.file)
+			'file[]': files
 		};
 		this.uploadImg(params);
 	}
-	// upload = () => {
-	// 	wx.ready(() => {
-	// 		wx.chooseImage({
-	// 			count: 9, // 默认9
-	// 			sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-	// 			sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-	// 			success: (res) => {
-	// 				var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
-	// 				let files = [];
-	// 				localIds.forEach((localId) => {
-	// 					wx.getLocalImgData({
-	// 						localId: localId, // 图片的localID
-	// 						success:  (res) => {
-	// 							files.push(res.localData); // localData是图片的base64数据，可以用img标签显示
-	// 						}
-	// 					});
-	// 				});
-	// 				this.setState({
-	// 					files:files
-	// 				});
-	// 			}
-	// 		});
-	// 	});
-	// }
+	upload = () => {
+		let len = (9 - this.state.imgs.length) >= 0 ? (9 - this.state.imgs.length) : 0;
+		wx.ready(() => {
+			wx.chooseImage({
+				count: len,
+				sizeType: ['compressed'],
+				sourceType: ['album', 'camera'],
+				success: (res) => {
+					let localIds = res.localIds;
+					let imgs = [...this.state.imgs, ...localIds];
+					this.setState({
+						len: imgs.length,
+						imgs: imgs
+					});
+					localIds.map((localId) => {
+						this.imgData(localId);
+					});
+				}
+			});
+		});
+	}
+	imgData = async (localId) => {
+		await wx.getLocalImgData({
+			localId: localId,
+			success: (res) => {
+				this.setState({
+					files: [...this.state.files,res.localData]
+				});
+			}
+		});
+	}
 	uploadImg = async (params) => {
-		Toast.info('上传图片中...', 10);
+		alert(this.state.files.length);
+		if(this.state.files.length !== this.state.imgs.length){
+			Toast.info('图片正在加载中,请稍等...', 2);
+			this.setState({
+				isBtn: false,
+			});
+			return false;
+		}
+		Toast.info('上传图片中...', 100);
 		const res = await urlAPi.addEvaluate(params);
 		Toast.info(res.message, 2, null, false);
 		if (Object.is(res.code, 0)) {
@@ -129,8 +147,15 @@ class Evaluate extends Component {
 			isBtn: false,
 		});
 	}
+	deleteImg = (index) => {
+		this.setState({
+			len: (this.state.imgs - 1),
+			imgs: this.state.imgs.filter((item, idx) => idx !== index),
+			files: this.state.files.filter((item, idx) => idx !== index),
+		});
+	}
 	render() {
-		const { star, files, multiple } = this.state;
+		const { star, files, multiple, imgs, hei } = this.state;
 		const { getFieldProps } = this.props.form;
 		return (
 			<div className="flex-col">
@@ -185,27 +210,29 @@ class Evaluate extends Component {
 							</List>
 						</div>
 						<div className="upload-img">
-							{/* <div className="am-image-picker-list" role="group">
+							<div className="am-image-picker-list" role="group">
 								<div className="am-flexbox am-flexbox-align-center ">
-									{files.length > 0 && (
-										files.map((file) => {
-											return (<div className="am-flexbox-item"><img src={file} /></div>);
+									{imgs.length > 0 && (
+										imgs.map((file, index) => {
+											return (<div className="am-flexbox-item" key={index}>
+												<div className="img-boxs">
+													<div style={{ padding: '10px' }}>
+														<p onClick={() => { this.deleteImg(index); }}>X</p><img src={file} />
+													</div>
+												</div>
+											</div>);
 										})
 									)}
-									<div className="am-flexbox-item">
-										<div className="am-image-picker-item am-image-picker-upload-btn" onClick={this.upload}></div>
-									</div>
-
+									<div className="am-flexbox-item flex-center am-upload-img" onClick={this.upload}></div>
 								</div>
-							</div> */}
-
-							<ImagePicker
+							</div>
+							{/* <ImagePicker
 								files={files}
 								onChange={this.onChange}
 								onImageClick={(index, fs) => console.log(index, fs)}
 								selectable={files.length < 9}
 								multiple={this.state.multiple}
-							/>
+							/> */}
 						</div>
 					</div>
 				</div>

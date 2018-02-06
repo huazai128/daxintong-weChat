@@ -1,0 +1,76 @@
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+import { Router,hashHistory } from 'react-router';
+import { Provider } from 'mobx-react';
+import 'app/subViewRoutes';
+// import 'app/utils/fastclick.min.js';
+import 'app/utils/fw';
+import 'app/components/subViewLink/subViewLink';
+import stores from 'app/stores';
+import 'assets/styles/entry.scss';
+import 'assets/styles/antd.global.scss';
+import 'assets/styles/flex.global.scss';
+import 'assets/styles/layout.global.scss';
+import { urlAPi } from 'service/api';
+import wx from 'weixin-js-sdk';
+import { getStore, setStore,removeStore } from 'utils/store';
+import { Toast } from 'antd-mobile';
+
+window.wx = wx;
+let RoutesConfig = require('app/routes').default;
+Toast.loading('', 4);
+removeStore('isStatus');
+let url = location.href.split('#')[0];
+urlAPi.share({ url: url }).then((res) => {
+	if (Object.is(res.code, 0) && Object.is(res.message, 'ok')) {
+		const { appId, timestamp, nonceStr, signature } = res.result;
+		wx.config({
+			debug: false,
+			appId: appId,
+			timestamp: timestamp,
+			nonceStr: nonceStr,
+			signature: signature,
+			jsApiList: [ // 注册方法
+				'checkJsApi',
+				'onMenuShareTimeline',
+				'onMenuShareAppMessage',
+				'onMenuShareQQ',
+				'onMenuShareWeibo',
+				'onMenuShareQZone',
+				'openLocation',
+				'previewImage',
+				'getLocation',
+				'chooseImage',
+				'uploadImage',
+				'getLocalImgData'
+			]
+		});
+	}
+	wx.ready(() => {
+		wx.getLocation({
+			type: 'gcj02', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+			success: (res) => {
+				setStore('location', res);
+			},
+			fail: (res) => {
+			},
+			complete: (res) => {
+				setStore('location', res);
+				Toast.hide();
+				ReactDOM.render(
+					<Provider {...stores}>
+						<RoutesConfig />
+					</Provider>,
+					document.getElementById('root')
+				);
+			}
+		});
+	});
+});
+// ReactDOM.render(
+// 	<Provider {...stores}>
+// 		<RoutesConfig />
+// 	</Provider>,
+// 	document.getElementById('root')
+// );
+

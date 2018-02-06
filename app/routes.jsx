@@ -79,198 +79,188 @@ const routes = [
 					}, 'login');
 				}
 			},
-			// 注册
-			{
-				path: '/register',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/RegPage/register').default);
-					}, 'register');
-				}
-			},
-			// 下单
-			{
-				path: '/order',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/Order/').default);
-					}, 'order');
-				}
-			},
-			// 评论列表
-			{
-				path: '/commnet-lists',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/CommentList/').default);
-					}, 'commnetLists');
-				}
-			},
-			// 评论列表
-			{
-				path: '/graphic',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/GraphicImg/graphic').default);
-					}, 'graphic');
-				}
-			},
 
-			// 支付订单
-			{
-				path: '/payment(/:id)',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/Payment/').default);
-					}, 'payment');
-				}
-			},
-			// 大信通卡绑定
-			{
-				path: '/binding',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/Binding/').default);
-					}, 'binding');
-				}
-			},
-			// z支付完成
-			{
-				path: '/payed/:id',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/Payed/payed').default);
-					}, 'payed');
-				}
-			},
-
-			// 收藏
-			{
-				path: '/collect',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/Collect/').default);
-					}, 'collect');
-				}
-			},
-			// 评论
-			{
-				path: '/comments',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/MyComments/comments').default);
-					}, 'comments');
-				}
-			},
-			// 大信通卡
-			{
-				path: '/dxcard',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/DaXinCard/card').default);
-					}, 'dxcard');
-				}
-			},
-			// 团购券
-			{
-				path: '/coupon',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/Coupon/').default);
-					}, 'coupon');
-				}
-			},
-			// 订单详情
-			{
-				path: '/order-detail',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/OrderDetail/detail').default);
-					}, 'order-user');
-				}
-			},
-			// 退款
-			{
-				path: '/refund',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/Refund/refund').default);
-					}, 'refund');
-				}
-			},
-			// 团购券详情
-			{
-				path: '/teamBuy',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/TeamBuy/').default);
-					}, 'teamBuy');
-				}
-			},
-			// 查看券码
-			{
-				path: '/code-detail',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/CodeDetail/code').default);
-					}, 'code-detail');
-				}
-			},
-			// 我要评价
-			{
-				path: '/evaluate',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/Evaluate/evaluate').default);
-					}, 'evaluate');
-				}
-			},
-			// 搜索结果
-			{
-				path: '/result',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/searchResult/result').default);
-					}, 'result');
-				}
-			},
-			// 修改手机
-			{
-				path: '/mobile',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/PhoneBind/').default);
-					}, 'mobile');
-				}
-			},
-			// 修改密码
-			{
-				path: '/password',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/Password/').default);
-					}, 'password');
-				}
-			},
-			// 忘记密码
-			{
-				path: '/forget',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/ForgetPassword/forget').default);
-					}, 'forget');
-				}
-			},
-			// 微信登录
-			{
-				path: '/wxLogin',
-				getComponent: (nextState, cb) => {
-					require.ensure([], (require) => {
-						cb(null, require('view/wxLogin/wx').default);
-					}, 'wxLogin');
-				}
-			},
 		]
+	},
+	// 注册
+	{
+		path: '/register',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/RegPage/register').default);
+			}, 'register');
+		}
+	},
+	// 下单
+	{
+		path: '/order',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/Order/').default);
+			}, 'order');
+		}
+	},
+	// 评论列表
+	{
+		path: '/commnet-lists',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/CommentList/').default);
+			}, 'commnetLists');
+		}
+	},
+	// 评论列表
+	{
+		path: '/graphic',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/GraphicImg/graphic').default);
+			}, 'graphic');
+		}
+	},
+	// 支付订单
+	{
+		path: '/payment(/:id)',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/Payment/').default);
+			}, 'payment');
+		}
+	},
+	// 大信通卡绑定
+	{
+		path: '/binding',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/Binding/').default);
+			}, 'binding');
+		}
+	},
+	// 收藏
+	{
+		path: '/collect',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/Collect/').default);
+			}, 'collect');
+		}
+	},
+	// 评论
+	{
+		path: '/comments',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/MyComments/comments').default);
+			}, 'comments');
+		}
+	},
+	// 大信通卡
+	{
+		path: '/dxcard',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/DaXinCard/card').default);
+			}, 'dxcard');
+		}
+	},
+	// 团购券
+	{
+		path: '/coupon',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/Coupon/').default);
+			}, 'coupon');
+		}
+	},
+	// 订单详情
+	{
+		path: '/order-detail',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/OrderDetail/detail').default);
+			}, 'order-user');
+		}
+	},
+	// 退款
+	{
+		path: '/refund',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/Refund/refund').default);
+			}, 'refund');
+		}
+	},
+	// 团购券详情
+	{
+		path: '/teamBuy',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/TeamBuy/').default);
+			}, 'teamBuy');
+		}
+	},
+	// 查看券码
+	{
+		path: '/code-detail',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/CodeDetail/code').default);
+			}, 'code-detail');
+		}
+	},
+	// 我要评价
+	{
+		path: '/evaluate',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/Evaluate/evaluate').default);
+			}, 'evaluate');
+		}
+	},
+	// 搜索结果
+	{
+		path: '/result',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/searchResult/result').default);
+			}, 'result');
+		}
+	},
+	// 修改手机
+	{
+		path: '/mobile',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/PhoneBind/').default);
+			}, 'mobile');
+		}
+	},
+	// 修改密码
+	{
+		path: '/password',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/Password/').default);
+			}, 'password');
+		}
+	},
+	// 忘记密码
+	{
+		path: '/forget',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/ForgetPassword/forget').default);
+			}, 'forget');
+		}
+	},
+	// 微信登录
+	{
+		path: '/wxLogin',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/wxLogin/wx').default);
+			}, 'wxLogin');
+		}
 	},
 	// pay
 	{
@@ -324,6 +314,15 @@ const routes = [
 			require.ensure([], (require) => {
 				cb(null, require('view/Search/').default);
 			}, 'search');
+		}
+	},
+	// z支付完成
+	{
+		path: '/payed/:id',
+		getComponent: (nextState, cb) => {
+			require.ensure([], (require) => {
+				cb(null, require('view/Payed/payed').default);
+			}, 'payed');
 		}
 	},
 ];

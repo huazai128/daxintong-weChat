@@ -26,12 +26,11 @@ class Store {
 	page = 1;
 	cate_id = null;
 	AlreadyCompleted = false;
-	quansId = JSON.parse(getStore('quansValue'));
 	@computed get query() {
 		return {
 			...this.url,
 			order_type: this.navsValue.toString(),
-			qid: this.quansValue.length ? this.quansValue.toString() : this.quansId || 24,
+			qid:  this.quansValue.toString(),
 			tid: this.catesValue.toString(),
 			page: this.page,
 			cate_id: this.cate_id,
@@ -56,7 +55,6 @@ class Store {
 	}
 	@action getQuans = () => {
 		this.quansValue = [];
-		this.quansId = JSON.parse(getStore('quansValue'));
 	}
 	// 获取数据
 	@action getData = async() => {
@@ -116,9 +114,6 @@ class Store {
 		});
 	}
 	@action onChange = (value, type, cb) => {
-		if (Object.is(type, 'quansValue')) {
-			setStore('quansValue', value);
-		}
 		this[type] = value;
 		cb && cb();
 	}

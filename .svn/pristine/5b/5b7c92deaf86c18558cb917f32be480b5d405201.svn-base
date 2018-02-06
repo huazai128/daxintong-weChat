@@ -1,0 +1,224 @@
+import React, { Component } from 'react';
+import CSSModules from 'react-css-modules';
+import RatingStar from 'components/RatingStar/star';
+import CommentItem from 'components/CommentItem';
+import Recommend from 'components/Recommend/recommend';
+import { urlAPi } from 'service/api';
+import { Carousel, Toast, Popover, NavBar, Icon } from 'antd-mobile';
+import { SubViewLink } from 'app/components/subViewLink/subViewLink';
+import ConfirmHtml from 'components/ConfirmHtml/';
+import ConfirmButton from 'components/ConfirmButton/';
+import { getStore } from 'utils/store';
+import { showUrl } from 'utils';
+import api from 'utils/api';
+import { meter } from 'utils/meter';
+import { hashHistory } from 'react-router';
+let wx = window.wx;
+
+@CSSModules(require('./index.scss'))
+class Business extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			comment_lists: [],
+			tuan_lists: [],
+			store_info: {},
+			tui_lists: [],
+			id: props.params ? props.params.id : props.modelData.id,
+			isMore: false,
+			len: 2,
+			isNav: false,
+			isShow: false
+		};
+	}
+	async componentDidMount() {
+		let locat = JSON.parse(getStore('location'));
+		let id = this.props.params ? this.props.params.id : this.props.modelData.id;
+		if (this.props.params && this.props.params.id) {
+			this.setState({
+				isNav: true
+			});
+		}
+		const params = {
+			data_id: id,
+			m_longitude: locat ? locat.longitude : '',
+			m_latitude: locat ? locat.latitude : ''
+		};
+		const res = await urlAPi.getBusiniss(params);
+		if (res.code == 0) {
+			this.setState({
+				comment_lists: res.result.dp_list,
+				tuan_lists: res.result.tuan_list,
+				store_info: res.result.store_info,
+				tuijian_lists: res.result.other_deal,
+				id: res.result.id,
+				dp_count: res.result.dp_count
+			});
+		}
+		this.share(res.result.store_info.id, res.result.store_info.name, res.result.store_info.preview);
+	}
+	// 分享
+	shareBtn = () => {
+		this.setState({
+			isShow: true
+		});
+	}
+	share = (id, title, imgUrl) => {
+		let url = location.href.split('#')[0];
+		wx.ready(() => {
+			let shareData = {
+				title: title,
+				desc: '',
+				link: `${url}?page=business&id=${id}`,
+				imgUrl: imgUrl
+			};
+			wx.onMenuShareAppMessage(shareData);
+			wx.onMenuShareTimeline(shareData);
+			wx.onMenuShareQQ(shareData);
+			wx.onMenuShareWeibo(shareData);
+			wx.onMenuShareQZone(shareData);
+		});
+	}
+	// 微信地图
+	getLocation = (obj) => {
+		wx.ready(() => {
+			wx.openLocation({
+				latitude: obj.ypoint, // 纬度，浮点数，范围为90 ~ -90
+				longitude: obj.xpoint, // 经度，浮点数，范围为180 ~ -180。
+				name: obj.name, // 位置名
+				address: obj.address, // 地址详情说明
+				scale: 16, // 地图缩放级别,整形值,范围从1~28。默认为最大
+				infoUrl: ''
+			});
+		});
+	}
+	more = (len) => {
+		this.setState({
+			len: this.state.isMore ? 2 : len,
+			isMore: !this.state.isMore,
+		});
+	}
+	componentWillUnmount() {
+		Toast.hide();
+	}
+	hide = () => {
+		this.setState({
+			isShow: false
+		});
+	}
+	onPhone = () => {
+		Toast.info('无电话号码', 2);
+	}
+	render() {
+		const { comment_lists, tuan_lists, store_info, tuijian_lists, dp_count, isMore, len, id, isNav, isShow, is_collect } = this.state;
+		return (
+			<div className="flex-col" style={{ overflow: 'hidden', height: '100%' }}>
+				{isNav && <div className="nv-box">
+					<div className="post-com go-icon" onClick={() => {
+						hashHistory.push('/');
+					}}></div>
+					<p>商家详情</p>
+					<div className="post-com post-right">
+						<ConfirmHtml id={id} isollect={is_collect} onChange={(value) => { this.changeHtml(value); }} />
+					</div>
+				</div>}
+				<div className="flex-g-1 scroll-absolute">
+					<div>
+						<div styleName="bux-img" className="swiper-container">
+							<img
+								src={store_info.preview ? store_info.preview : require('images/index01.jpg')}
+								style={{ width: '100%', height: '100%' }}
+							/>
+						</div>
+						<div styleName="bus-info" className="flex mdao-damo">
+							<div className="flex-g-1">
+								<h4>{store_info.name}</h4>
+								<RatingStar star={store_info.avg_point}></RatingStar>
+							</div>
+							<Popover mask
+								overlayStyle={{ color: 'currentColor', top: 0, right: 0, bottom: 0, left: 0, }}
+								visible={isShow}
+								align={{
+									overflow: { adjustY: 0, adjustX: 0 },
+									offset: [0, 0],
+								}}
+								placement="topRight"
+								overlay={[
+									<div className="yin-box" onClick={this.hide}><div></div></div>,
+								]}
+							>
+								<div styleName="bus-show" onClick={() => { this.share(store_info.id, store_info.name, store_info.preview); }}></div>
+							</Popover>
+						</div>
+						<div styleName="bus-pos" className="flex mb20">
+							<div styleName="bus-address" className="flex-col-10 flex-col " onClick={() => { this.getLocation(store_info); }}>
+								<p>{store_info.address}</p>
+								<p>{meter(store_info.distance)}</p>
+							</div>
+							{store_info.tel && (<a href={`tel:${store_info.tel}`} style={{ display: 'block' }} styleName="bus-iphone" className="flex-col-2"></a>)}
+							{!store_info.tel && (<div onClick={this.onPhone} style={{ display: 'block' }} styleName="bus-iphone" className="flex-col-2"></div>)}
+						</div>
+						<div className="mb30">
+							<div styleName="bus-box" >
+								{
+									tuan_lists && tuan_lists.length > 0 && (
+										<div styleName="bus-head">
+											<h4>团购套餐 ({tuan_lists.length})</h4>
+											<div styleName="bus-tuan">
+												{tuan_lists.length > 0 && tuan_lists.slice(0, len).map((item) => {
+													return (
+														<SubViewLink key={item.id} moduleName="cateDetail" title="团购详情" modelData={{ id: item.id }} confirmButtonHtml={<ConfirmButton onChange={(value) => { item.is_collect = value; }} id={item.id} item={item} isCollect={item.is_collect} />}>
+															<div className="flex" key={item.id} styleName="tuan-lists">
+																<div styleName="img"><img src={item.icon ? item.icon : require('images/index01.jpg')} /></div>
+																<div className="flex-g-1 scroll-absolute bus-height" >
+																	<div style={{ overflow: 'hidden' }}>
+																		<h5>{item.name}</h5>
+																		<p style={{ paddingTop: '4px' }}>周一至周日</p>
+																		<div className="flex" >
+																			<div styleName="price">￥{item.current_price}</div>
+																			<p styleName="real">门市价:￥{item.origin_price}</p>
+																		</div>
+																	</div>
+																</div>
+																<div styleName="num">已售{item.buy_count}</div>
+															</div>
+														</SubViewLink>
+													);
+												})}
+												{tuan_lists && tuan_lists.length > 2 && <div className='flex-center bus-more' onClick={() => { this.more(tuan_lists.length); }}> {!isMore ? `查看其它${tuan_lists.length - 2}条团购` : '收起'}</div>}
+											</div>
+										</div>
+									)
+								}
+								<div styleName="bus-comment">
+									{comment_lists && comment_lists.length > 0 && (
+										<h4>
+											<SubViewLink moduleName="commnents" title="评论列表" modelData={{ data_id: id, type: 'store' }}>用户评价 <span>({dp_count || 0})</span></SubViewLink>
+										</h4>
+									)}
+									<div>
+										{comment_lists && comment_lists.slice(0, 5).map((item) => (
+											<CommentItem key={item.id} datas={item} status={true}></CommentItem>
+										))}
+									</div>
+								</div>
+								{comment_lists && comment_lists.length > 0 && (<SubViewLink moduleName="commnents" title="评论列表" modelData={{ data_id: id, type: 'store' }}><div styleName="bus-btn" className="flex jc-between">
+									<p>查看全部用户评价</p>
+									<div>共{comment_lists && comment_lists.length}条</div>
+								</div></SubViewLink>)}
+							</div>
+							{comment_lists && comment_lists.length == 0 && (
+								<p styleName="no-comments">暂无评论</p>
+							)}
+						</div>
+						<div>
+							{tuijian_lists && <Recommend title="为您推荐" datas={tuijian_lists}></Recommend>}
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+	}
+}
+
+export default Business;

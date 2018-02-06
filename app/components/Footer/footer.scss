@@ -1,6 +1,11 @@
 :global{
 	#footer {
+		position: absolute;
+		bottom: 0;
+		left: 0;
 		height: 100px;
+		width: 100%;
+		z-index: 100;
 		border-top: 1px solid #ccc;
 		background-color: #fff;
 		.text {

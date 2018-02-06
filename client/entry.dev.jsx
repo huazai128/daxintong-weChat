@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { Router,hashHistory } from 'react-router';
+import { Router, hashHistory } from 'react-router';
 import { Provider } from 'mobx-react';
 import 'app/subViewRoutes';
 // import 'app/utils/fastclick.min.js';
@@ -13,14 +13,41 @@ import 'assets/styles/flex.global.scss';
 import 'assets/styles/layout.global.scss';
 import { urlAPi } from 'service/api';
 import wx from 'weixin-js-sdk';
-import { getStore, setStore,removeStore } from 'utils/store';
+import { getStore, setStore, removeStore } from 'utils/store';
 import { Toast } from 'antd-mobile';
-
 window.wx = wx;
 let RoutesConfig = require('app/routes').default;
-Toast.loading('', 4);
+Toast.loading('', 10);
 removeStore('isStatus');
+function getQueryString(name) {
+	var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+	var r = window.location.search.substr(1).match(reg);
+	if (r != null) return (r[2]); return null;
+}
+
+let page = getQueryString('page');
+let id = getQueryString('id');
 let url = location.href.split('#')[0];
+if (page && id) {
+	url = url.split('?')[0];
+	url = `${url}/#/${page}/${id}`;
+}
+window.onerror = (message, file, line, col, error) => {
+	var http = new XMLHttpRequest();
+	var data = JSON.stringify({
+		file: file,
+		line: line,
+		col: col,
+		message: message,
+		url: location.href,
+		stack: error ? error.stack : ''
+	});
+	http.open('POST', 'https://testtuan.daxinmall.com/wxtest/wx/index.php?ctl=index&act=monitor_js', true);
+	http.setRequestHeader('Content-type', 'application/json');
+	http.setRequestHeader('Content-length', data.length);
+	http.setRequestHeader('Connection', 'close');
+	http.send(data);
+};
 urlAPi.share({ url: url }).then((res) => {
 	if (Object.is(res.code, 0) && Object.is(res.message, 'ok')) {
 		const { appId, timestamp, nonceStr, signature } = res.result;
@@ -46,30 +73,15 @@ urlAPi.share({ url: url }).then((res) => {
 			]
 		});
 	}
-	wx.ready(() => {
-		wx.getLocation({
-			type: 'gcj02', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
-			success: (res) => {
-				setStore('location', res);
-			},
-			fail: (res) => {
-			},
-			complete: (res) => {
-				setStore('location', res);
-				Toast.hide();
-				// ReactDOM.render(
-				// 	<Provider {...stores}>
-				// 		<RoutesConfig />
-				// 	</Provider>,
-				// 	document.getElementById('root')
-				// );
-			}
-		});
-	});
+	ReactDOM.render(
+		<Provider {...stores}>
+			<RoutesConfig />
+		</Provider>,
+		document.getElementById('root')
+	);
+	setTimeout(() => {
+		Toast.hide();
+	}, 1000);
 });
-ReactDOM.render(
-	<Provider {...stores}>
-		<RoutesConfig />
-	</Provider>,
-	document.getElementById('root')
-);
+
+

@@ -20,8 +20,6 @@ export default class extends Component {
 			sreaches: []
 		};
 	}
-	componentWillMount(){
-	}
 	onCancel = () => {
 		let { name='/' } = this.val(this, 'props.location.query');
 		hashHistory.push(name);
@@ -67,6 +65,9 @@ export default class extends Component {
 			sreaches: sreaches
 		});
 	}
+	componentDidUpdate(){
+		this.autoFocusInst.focus();
+	}
 	componentWillReceiveProps() {
 		let sreaches = JSON.parse(getStore('history'));
 		this.setState({
@@ -90,7 +91,6 @@ export default class extends Component {
 						onSubmit={this.onSubmit}
 						onCancel={this.onCancel}
 						onBlur={this.onSubmit}
-						showCancelButton
 					/>
 				</div>
 				<div className="hisLists">

@@ -1,0 +1,82 @@
+:global{
+	.comment-content{
+		background: #fff;
+		.comment-head{
+			padding: 30px 0 40px;
+		}
+		.comment-num{
+			width: 185px;
+			height: 215px;
+			border: 1px solid #ededed;
+			margin: 0 35px;
+			padding: 10px;
+			text-align: center;
+			h3{
+				font-size: 48px;
+				color: #ff7d0f;
+				font-weight: 300;
+				margin:0;
+				padding: 15px 0 25px;
+				border-bottom: 3px solid #c6c6c6;
+			}
+			p{
+				padding: 25px 0;
+				color: #333;
+				font-size: 24px;
+			}
+		}
+		.grade-lists{
+			padding-right: 30px;
+			font-size: 24px;
+			margin-bottom: 13px;
+			.grade-star{
+				font-size: 28px;
+				color: #333;
+				line-height: 35px;
+				overflow: hidden;
+			}
+			.grade-box{
+				margin: 0 20px;
+				width: 225px;
+				position: relative;
+				border-radius: 10px;
+				background: #dfe0e2;
+				height: 35px;
+				.grade-width{
+					position: absolute;
+					top: 0;
+					left: 0;
+					height: 100%;
+					border-radius: 10px;
+					background: #ff7900;
+					z-index: 10;
+				}
+			}
+		}
+	}
+	.comment-lists{
+		background: #fff;
+		width: 100%;
+	}
+	.comment-form{
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 100px;
+		line-height: 100px;
+		background: #4794fe;
+		text-align: center;
+		 p{
+			 font-size: 32px;
+			 color: #fff;
+		 }
+	}
+	.comments-not{
+		padding: 60px 0;
+		text-align: center;
+		background: #fff;
+		font-size: 32px;
+		color: #666;
+	}
+}
